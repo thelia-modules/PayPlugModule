@@ -1,0 +1,376 @@
+{extends file="admin-layout.tpl"}
+
+{block name="after-bootstrap-css"}
+
+{/block}
+
+{block name="no-return-functions"}
+{$admin_current_location = 'module'}
+{/block}
+
+{block name="page-title"}{intl l='PayPlug module configuration' d='payplugmodule.bo.default'}{/block}
+
+{block name="check-resource"}admin.module{/block}
+{block name="check-access"}view{/block}
+{block name="check-module"}PayPlug{/block}
+
+{block name="main-content"}
+    <style>
+        .block {
+            padding: 20px;
+            border-bottom: 2px solid #00AB7A;
+        }
+        .block h2 {
+            color: #00AB7A;
+        }
+        .block .block {
+            border: 2px solid rgba(0, 211, 152, 0.61);
+        }
+    </style>
+<div class="col-md-12">
+    <div class="panel panel-default">
+        {form name="payplugmodule_configuration_form"}
+            <form action="{url path="/admin/module/payplugmodule/configuration"}" method="POST">
+                {form_hidden_fields form=$form}
+
+                {if $form_error}
+                <div class="alert alert-danger">{$form_error_message}</div>
+                {/if}
+
+                {form_field form=$form field='success_url'}
+                <input type="hidden" name="{$name}" value="{url path={navigate to="current"}}"/>
+                {/form_field}
+
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="block col-md-12">
+                            <div class="col-md-12">
+                                <h2>{intl l="PayPlug offer" d='payplugmodule.bo.default'}</h2>
+                            </div>
+                            <div class="col-md-12">
+                                {form_field form=$form field="offer"}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label class="control-label">{$label}{if $required}<span class="required">*</span>{/if}</label>
+                                        <br>
+                                        {$inputOfferName = {$name}}
+                                        {foreach from=$choices item=choice}
+                                            <input id="{$name}_{$choice->value}" name="{$name}" type="radio" value="{$choice->value}" {if $data == $choice->value}checked{/if} />
+                                            <label class="control-label" for="{$name}_{$choice->value}">{$choice->label}</label>
+                                        {/foreach}
+                                        {if ! empty($label_attr.help)}
+                                            <span class="help-block">{$label_attr.help}</span>
+                                        {/if}
+                                    </div>
+                                {/form_field}
+                            </div>
+                        </div>
+                        <div class="block col-md-12">
+                            <div class="col-md-12">
+                                <h2>{intl l="PayPlug API configuration" d='payplugmodule.bo.default'}</h2>
+                            </div>
+                            <div class="col-md-4">
+                                {form_field form=$form field="api_mode"}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label class="control-label" for="{$name}">
+
+                                            {$label}{if $required}<span class="required">*</span>{/if}
+                                            <br>
+                                            <select class="form-control" name="{$name}" id="{$name}">
+                                                {foreach from=$choices item=choice}
+                                                    <option value="{$choice->value}" {if $data == $choice->value}selected{/if}>{$choice->label}</option>
+                                                {/foreach}
+                                            </select>
+                                        </label>
+
+                                        {if ! empty($label_attr.help)}
+                                            <span class="help-block">{$label_attr.help}</span>
+                                        {/if}
+                                    </div>
+                                {/form_field}
+                            </div>
+                            <div class="col-md-4">
+                                {form_field form=$form field='live_api_key'}
+                                    <label for="{$name}" class="control-label">{$label}</label>
+                                    <input id="{$name}" class="form-control" type="text" name="{$name}" value="{$data}"/>
+                                    {if ! empty($label_attr.help)}
+                                        <span class="help-block">{$label_attr.help nofilter}</span>
+                                    {/if}
+                                {/form_field}
+                            </div>
+                            <div class="col-md-4">
+                                {form_field form=$form field='test_api_key'}
+                                    <label for="{$name}" class="control-label">{$label}</label>
+                                    <input id="{$name}" class="form-control" type="text" name="{$name}" value="{$data}"/>
+                                    {if ! empty($label_attr.help)}
+                                        <span class="help-block">{$label_attr.help nofilter}</span>
+                                    {/if}
+                                {/form_field}
+                            </div>
+                        </div>
+                        <div class="block col-md-12" id="basic_configuration">
+                            <div class="col-md-12">
+                                <h2>{intl l="PayPlug basic payment configuration" d='payplugmodule.bo.default'}</h2>
+                            </div>
+                            <div class="col-md-12">
+                                {form_field form=$form field="payment_enabled"}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label class="control-label" for="{$name}">
+                                            <input type="checkbox" name="{$name}" id="{$name}" {if $data}checked{/if}/>
+                                            {$label}
+                                            {if $required}<span class="required">*</span>{/if}
+                                        </label>
+
+                                        {if ! empty($label_attr.help)}
+                                            <span class="help-block">{$label_attr.help}</span>
+                                        {/if}
+                                    </div>
+                                {/form_field}
+                            </div>
+                            <div class="col-md-12">
+                                {form_field form=$form field="payment_page_type"}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label class="control-label" for="{$name}">
+                                            {$label}{if $required}<span class="required">*</span>{/if}
+                                            <br>
+                                            <select class="form-control" name="{$name}" id="{$name}">
+                                                {foreach from=$choices item=choice}
+                                                    <option value="{$choice->value}" {if $data == $choice->value}selected{/if}>{$choice->label}</option>
+                                                {/foreach}
+                                            </select>
+                                        </label>
+
+                                        {if ! empty($label_attr.help)}
+                                            <span class="help-block">{$label_attr.help}</span>
+                                        {/if}
+                                    </div>
+                                {/form_field}
+                            </div>
+                        </div>
+                        <div class="block col-md-12" id="pro_configuration">
+                            <div class="col-md-12">
+                                <h2>{intl l="PayPlug pro offer configuration" d='payplugmodule.bo.default'}</h2>
+                            </div>
+                            <div class="col-md-12">
+                                {form_field form=$form field="one_click_payment_enabled"}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label class="control-label" for="{$name}">
+                                            <input type="checkbox" name="{$name}" id="{$name}" {if $data}checked{/if}/>
+                                            {$label}
+
+                                        </label>
+
+                                        {if ! empty($label_attr.help)}
+                                            <span class="help-block">{$label_attr.help}</span>
+                                        {/if}
+                                    </div>
+                                {/form_field}
+                            </div>
+                            <div class="col-md-12">
+                                {form_field form=$form field="multi_payment_enabled"}
+                                    {$inputMultiPaymentName = $name}
+                                    <div class="form-group {if $error}has-error{/if}">
+                                        <label class="control-label" for="{$name}">
+                                            <input type="checkbox" name="{$name}" id="{$name}" {if $data}checked{/if}/>
+                                            {$label}
+                                        </label>
+
+                                        {if ! empty($label_attr.help)}
+                                            <span class="help-block">{$label_attr.help}</span>
+                                        {/if}
+                                    </div>
+                                {/form_field}
+                            </div>
+                            <div class="block col-md-12" id="multi_payment_fields">
+                                <div class="alert alert-warning">
+                                    {intl l="Payments in several times are not guaranteed, a default may occur on future due dates." d='payplugmodule.bo.default'}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field form=$form field='multi_payment_minimum'}
+                                        <label for="auth_key" class="control-label">{$label}</label>
+                                        <input id="auth_key" class="form-control" type="number" min="0" name="{$name}" value="{$data}"/>
+                                    {/form_field}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field form=$form field='multi_payment_maximum'}
+                                        <label for="auth_key" class="control-label">{$label}</label>
+                                        <input id="auth_key" class="form-control" type="number" min="0" name="{$name}" value="{$data}"/>
+                                    {/form_field}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field form=$form field="multi_payment_times"}
+                                        <div class="form-group {if $error}has-error{/if}">
+                                            <label class="control-label" for="{$name}">
+                                                {$label}{if $required}<span class="required">*</span>{/if}
+                                                <br>
+                                                <select class="form-control" name="{$name}" id="{$name}">
+                                                    {foreach from=$choices item=choice}
+                                                        <option value="{$choice->value}" {if $data == $choice->value}selected{/if}>{$choice->label}</option>
+                                                    {/foreach}
+                                                </select>
+                                            </label>
+                                            {if ! empty($label_attr.help)}
+                                                <span class="help-block">{$label_attr.help}</span>
+                                            {/if}
+                                        </div>
+                                    {/form_field}
+                                </div>
+                                <div class="alert alert-info col-md-12">
+                                    <p>
+                                        {intl l="To trigger the payments on planned date please add a daily cron on this Thelia command " d='payplugmodule.bo.default'}
+                                        <strong>php Thelia payplug:treat:multi_payment</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="block col-md-12" id="premium_configuration">
+                            <div class="col-md-12">
+                                <h2>{intl l="PayPlug premium offer configuration" d='payplugmodule.bo.default'}</h2>
+                            </div>
+                            <div class="col-md-12">
+                                {form_field form=$form field="differed_payment_enabled"}
+                                {$inputDifferedPaymentName = $name}
+                                <div class="form-group {if $error}has-error{/if}">
+                                    <label class="control-label" for="{$name}">
+                                        <input type="checkbox" name="{$name}" id="{$name}" {if $data}checked{/if}/>
+                                        {$label}
+                                    </label>
+
+                                    {if ! empty($label_attr.help)}
+                                        <span class="help-block">{$label_attr.help}</span>
+                                    {/if}
+                                </div>
+                                {/form_field}
+                            </div>
+                            <div class="block col-md-12" id="differed_payment_fields">
+                                <div class="col-md-4">
+                                    {form_field form=$form field="differed_payment_authorized_capture_status"}
+                                        <div class="form-group {if $error}has-error{/if}">
+                                            <label class="control-label" for="{$name}">
+                                                {$label}{if $required}<span class="required">*</span>{/if}
+                                                <br>
+                                                <select class="form-control" name="{$name}" id="{$name}">
+                                                    {loop type="order-status" name="order-status-select" backend_context="1"}
+                                                        <option value="{$ID}" {if $data == $ID}selected{/if}>{$TITLE}</option>
+                                                    {/loop}
+                                                </select>
+                                            </label>
+                                            {if ! empty($label_attr.help)}
+                                                <span class="help-block">{$label_attr.help}</span>
+                                            {/if}
+                                        </div>
+                                    {/form_field}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field form=$form field="differed_payment_trigger_capture_status"}
+                                        <div class="form-group {if $error}has-error{/if}">
+                                            <label class="control-label" for="{$name}">
+                                                {$label}{if $required}<span class="required">*</span>{/if}
+                                                <br>
+                                                <select class="form-control" name="{$name}" id="{$name}">
+                                                    {loop type="order-status" name="order-status-select" backend_context="1"}
+                                                        <option value="{$ID}" {if $data == $ID}selected{/if}>{$TITLE}</option>
+                                                    {/loop}
+                                                </select>
+                                            </label>
+                                            {if ! empty($label_attr.help)}
+                                                <span class="help-block">{$label_attr.help}</span>
+                                            {/if}
+                                        </div>
+                                    {/form_field}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field form=$form field="differed_payment_capture_expired_status"}
+                                        <div class="form-group {if $error}has-error{/if}">
+                                            <label class="control-label" for="{$name}">
+                                                {$label}{if $required}<span class="required">*</span>{/if}
+                                                <br>
+                                                <select class="form-control" name="{$name}" id="{$name}">
+                                                    {loop type="order-status" name="order-status-select" backend_context="1"}
+                                                        <option value="{$ID}" {if $data == $ID}selected{/if}>{$TITLE}</option>
+                                                    {/loop}
+                                                </select>
+                                            </label>
+                                            {if ! empty($label_attr.help)}
+                                                <span class="help-block">{$label_attr.help}</span>
+                                            {/if}
+                                        </div>
+                                    {/form_field}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="submit" class="btn btn-success form-control" value="{intl l="Save" d='payplugmodule.bo.default'}">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {/form}
+    </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}
+
+{/block}
+
+{block name="javascript-last-call"}
+    <script type="text/javascript">
+        var inputOfferName = "{$inputOfferName}";
+        var inputMultiPaymentName = "{$inputMultiPaymentName}";
+        var inputDifferedPaymentName = "{$inputDifferedPaymentName}";
+        {literal}
+            jQuery(function($) {
+                displayConfigurationBlock();
+                displayMultiPaymentBlock();
+                displayDifferedPaymentBlock();
+
+                $('input[name="'+inputOfferName+'"]').click(function(){
+                    displayConfigurationBlock();
+                });
+
+                $('input[name="'+inputMultiPaymentName+'"]').click(function(){
+                    displayMultiPaymentBlock();
+                });
+
+                $('input[name="'+inputDifferedPaymentName+'"]').click(function(){
+                    displayDifferedPaymentBlock();
+                });
+
+                function displayConfigurationBlock() {
+                    var inputOfferChecked = $('input[name="'+inputOfferName+'"]:checked');
+                    var proConfigurationBlock = $("#pro_configuration");
+                    var premiumConfigurationBlock = $("#premium_configuration");
+
+                    proConfigurationBlock.hide();
+                    premiumConfigurationBlock.hide();
+
+                    if (inputOfferChecked.val() === 'pro') {
+                        proConfigurationBlock.show();
+                    } else if (inputOfferChecked.val() === 'premium') {
+                        proConfigurationBlock.show();
+                        premiumConfigurationBlock.show();
+                    }
+                }
+
+                function displayMultiPaymentBlock() {
+                    var multiPaymentBlock = $("#multi_payment_fields");
+                    multiPaymentBlock.hide();
+                    if( $('input[name="'+inputMultiPaymentName+'"]').is(':checked') ){
+                        multiPaymentBlock.show();
+                    }
+                }
+
+                function displayDifferedPaymentBlock() {
+                    var differedPaymentBlock = $("#differed_payment_fields");
+                    differedPaymentBlock.hide();
+                    if( $('input[name="'+inputDifferedPaymentName+'"]').is(':checked') ){
+                        differedPaymentBlock.show();
+                    }
+                }
+            });
+        {/literal}
+    </script>
+{/block}

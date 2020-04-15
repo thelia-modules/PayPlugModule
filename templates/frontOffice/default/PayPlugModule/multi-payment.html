@@ -1,0 +1,8 @@
+{form_field form=$form field='pay_plug_multi_payment'}
+    <p>
+        <input id="{$name}" type="checkbox" name="{$name}" value="1">
+        <label for="{$name}">{intl l='Pay in %n times without fees.' n={$nTimes}  d='payplugmodule.fo.default'}</label>
+        <br>
+        {intl l='You will be asked to save your payment card data.' n={url path='/payplug/card/delete'}  d='payplugmodule.fo.default'}
+    </p>
+{/form_field}

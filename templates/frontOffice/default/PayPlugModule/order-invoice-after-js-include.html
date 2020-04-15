@@ -1,0 +1,34 @@
+<script type="text/javascript" src="https://api.payplug.com/js/1/form.latest.js"></script>
+
+<script>
+    var payPlugModuleId = '{$payPlugModuleId}';
+
+    {literal}
+       var form = document.getElementById('form-cart-payment');
+        form.addEventListener('submit', function (event) {
+            var payPlugRadio = $('#payment_'+payPlugModuleId);
+            if(payPlugRadio.is(':checked')) {
+                event.preventDefault();
+
+                var form = $(this);
+                var url = form.attr('action');
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: form.serialize(),
+                }).success(function (data) {
+                    if (true === data.forceRedirect) {
+                        window.location.replace(data.paymentUrl);
+                    } else {
+                        Payplug.showPayment(data.paymentUrl);
+                    }
+                }).fail(function (data) {
+                    var payPlugLi = payPlugRadio.parent().parent();
+                    console.log(payPlugLi);
+                    console.log(data.responseJSON.error);
+                    payPlugLi.prepend('<div class="alert alert-danger">Error : '+data.responseJSON.error+'</div>');
+                })
+            }
+        });
+    {/literal}
+</script>

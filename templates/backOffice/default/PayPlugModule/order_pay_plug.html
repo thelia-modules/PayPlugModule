@@ -1,0 +1,123 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>{intl l="PayPlug order data"  d='payplugmodule.bo.default'}</h4>
+    </div>
+    <table class="table table-condensed table-left-aligned">
+        <tbody>
+        {if $amountRefunded || $isPaid}
+            <tr>
+                <th>{intl l="Refund"  d='payplugmodule.bo.default'}</th>
+                <td></td>
+                <td>
+                    {if $amountRefunded}
+                        {format_money number=$amountRefunded/100}{intl l=" refunded"  d='payplugmodule.bo.default'}
+                    {elseif $isPaid}
+                        <a class="btn btn-block btn-success image-delete" href="#order_refund_dialog" data-toggle="modal">
+                            {intl l="Refund this order" d='payplugmodule.bo.default'}
+                        </a>
+                    {/if}
+                </td>
+            </tr>
+        {/if}
+        {if $needCapture}
+            <tr>
+                <th>{intl l="Differed payment" d='payplugmodule.bo.default'}</th>
+                {if null == $capturedAt}
+                    <td>{intl l="Payment capture will expire on " d='payplugmodule.bo.default'}{format_date date=$captureExpireAt}</td>
+                    <td>
+                        <a class="btn btn-block btn-success image-delete" href="#order_capture_dialog" data-toggle="modal">
+                            {intl l="Force the capture for this order" d='payplugmodule.bo.default'}
+                        </a>
+                    </td>
+                {else}
+                    <td></td>
+                    <td>
+                        {intl l="Payment was captured at "  d='payplugmodule.bo.default'}{format_date date=$capturedAt}
+                    </td>
+                {/if}
+            </tr>
+        {/if}
+        {if count($multiPayments) > 0}
+            <tr>
+                <th>{intl l="Multi payment" d='payplugmodule.bo.default'}</th>
+                <td colspan="2">
+                    <table class="table table-condensed table-left-aligned">
+                        <tr>
+                            <th>{intl l="Payment n° " d='payplugmodule.bo.default'}</th>
+                            <th>{intl l="Amount" d='payplugmodule.bo.default'}</th>
+                            <th>{intl l="Planned at" d='payplugmodule.bo.default'}</th>
+                            <th>{intl l="Paid at" d='payplugmodule.bo.default'}</th>
+                            <th>{intl l="Refunded at" d='payplugmodule.bo.default'}</th>
+                        </tr>
+                        {$paymentCount = 1}
+                        {foreach from=$multiPayments item=multiPayment}
+                            <tr>
+                                <td>{$paymentCount}</td>
+                                <td>{format_money number=$multiPayment['amount']/100}</td>
+                                <td>{if $multiPayment['plannedAt']}{format_date date=$multiPayment['plannedAt']}{else}{intl l="Canceled" d='payplugmodule.bo.default'}{/if}</td>
+                                <td>{if $multiPayment['paidAt']}{format_date date=$multiPayment['paidAt']}{/if}</td>
+                                <td>{if $multiPayment['refundedAt']}{format_date date=$multiPayment['refundedAt']}{/if}</td>
+                            </tr>
+                            {$paymentCount = $paymentCount + 1}
+                        {/foreach}
+                    </table>
+                </td>
+            </tr>
+        {/if}
+        </tbody>
+    </table>
+</div>
+
+{capture "refund_dialog"}
+    {form name="payplugmodule_order_action_form"}
+    {form_hidden_fields form=$form}
+    {if $form_error}
+        <div class="alert alert-danger">{$form_error_message}</div>
+    {/if}
+    {form_field form=$form field='success_url'}
+        <input type="hidden" name="{$name}" value="{url path={navigate to="current"}}"/>
+    {/form_field}
+    {form_field form=$form field="order_id"}
+        <input type="hidden" name="{$name}" value="{$order_id}">
+    {/form_field}
+    {/form}
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "order_refund_dialog"
+    dialog_title    = {intl l="Refund order" d="payplugmodule.bo.default"}
+    dialog_message  = {intl l="Do you really want to refund this order ?" d="payplugmodule.bo.default"}
+
+form_method         = "POST"
+form_action         = {url path='/admin/payplugmodule/order/refund'}
+form_content        = {$smarty.capture.refund_dialog nofilter}
+}
+
+{capture "capture_dialog"}
+    {form name="payplugmodule_order_action_form"}
+    {form_hidden_fields form=$form}
+    {if $form_error}
+        <div class="alert alert-danger">{$form_error_message}</div>
+    {/if}
+    {form_field form=$form field='success_url'}
+        <input type="hidden" name="{$name}" value="{url path={navigate to="current"}}"/>
+    {/form_field}
+    {form_field form=$form field="order_id"}
+        <input type="hidden" name="{$name}" value="{$order_id}">
+    {/form_field}
+    {/form}
+{/capture}
+
+{include
+file = "includes/generic-confirm-dialog.html"
+
+dialog_id       = "order_capture_dialog"
+dialog_title    = {intl l="Capture order" d="payplugmodule.bo.default"}
+dialog_message  = {intl l="Do you really want to capture this order ?" d="payplugmodule.bo.default"}
+
+form_method         = "POST"
+form_action         = {url path='/admin/payplugmodule/order/capture'}
+form_content        = {$smarty.capture.capture_dialog nofilter}
+}

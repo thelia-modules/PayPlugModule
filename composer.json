@@ -1,0 +1,13 @@
+{
+  "name": "thelia/pay-plug-module-module",
+  "license": "LGPL-3.0-or-later",
+  "type": "thelia-module",
+  "require": {
+    "thelia/installer": "~1.1",
+    "payplug/payplug-php": "^3.2",
+    "giggsey/libphonenumber-for-php": "^8.12"
+  },
+  "extra": {
+    "installer-name": "PayPlugModule"
+  }
+}

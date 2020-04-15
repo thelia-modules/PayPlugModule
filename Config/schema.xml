@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="thelia"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <table name="order_pay_plug_data" namespace="PayPlugModule\Model">
+        <column name="id" type="INTEGER" required="true" primaryKey="true"/>
+        <column name="amount_refunded" scale="6" size="16" type="DECIMAL" />
+        <column name="need_capture" type="TINYINT" default="0"/>
+        <column name="capture_expire_at" type="TIMESTAMP" />
+        <column name="captured_at" type="TIMESTAMP" />
+
+        <foreign-key foreignTable="order" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="id" foreign="id" />
+        </foreign-key>
+    </table>
+
+    <table name="pay_plug_card" namespace="PayPlugModule\Model">
+        <column name="uuid" type="VARCHAR" size="255" primaryKey="true"/>
+        <column name="customer_id" type="INTEGER"/>
+        <column name="brand" type="VARCHAR" size="255" />
+        <column name="last_4" type="VARCHAR" size="255" />
+        <column name="expire_month" type="INTEGER" />
+        <column name="expire_year" type="INTEGER" />
+
+        <foreign-key foreignTable="customer" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="customer_id" foreign="id" />
+        </foreign-key>
+    </table>
+
+    <table name="order_pay_plug_multi_payment" namespace="PayPlugModule\Model">
+        <column autoIncrement="true" name="id" type="INTEGER" required="true" primaryKey="true"/>
+        <column name="order_id" type="INTEGER" required="true" primaryKey="true"/>
+        <column name="amount" scale="6" size="16" type="DECIMAL" />
+        <column name="is_first_payment" type="TINYINT" default="0"/>
+        <column name="planned_at" type="TIMESTAMP" />
+        <column name="payment_method" type="VARCHAR" size="255" />
+        <column name="payment_id" type="VARCHAR" size="255" />
+        <column name="paid_at" type="TIMESTAMP" />
+        <column name="refunded_at" type="TIMESTAMP" />
+
+        <foreign-key foreignTable="order" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="order_id" foreign="id" />
+        </foreign-key>
+    </table>
+
+    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
+</database>

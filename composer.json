@@ -1,5 +1,5 @@
 {
-  "name": "thelia/pay-plug-module-module",
+  "name": "thelia/pay-plug-module",
   "license": "LGPL-3.0-or-later",
   "type": "thelia-module",
   "require": {

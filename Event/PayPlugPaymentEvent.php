@@ -559,10 +559,13 @@ class PayPlugPaymentEvent extends ActionEvent
             ->{'set'.$addressType.'FirstName'}($addressData->getFirstname())
             ->{'set'.$addressType.'LastName'}($addressData->getLastname())
             ->{'set'.$addressType.'Address1'}($addressData->getAddress1())
-            ->{'set'.$addressType.'Address2'}($addressData->getAddress2())
             ->{'set'.$addressType.'Postcode'}($addressData->getZipcode())
             ->{'set'.$addressType.'City'}($addressData->getCity())
             ->{'set'.$addressType.'Country'}($addressData->getCountry()->getIsoalpha2());
+
+        if (null !== $addressData->getAddress2()) {
+            $this->{'set'.$addressType.'Address2'}($addressData->getAddress2());
+        }
 
         if (null !== $state = $addressData->getState()) {
             $this->{'set'.$addressType.'State'}($state->getIsocode());

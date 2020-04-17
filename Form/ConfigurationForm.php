@@ -192,6 +192,16 @@ class ConfigurationForm extends BaseForm
                     "required" => false
                 ]
             )
+            ->add(
+                PayPlugConfigValue::SEND_CONFIRMATION_MESSAGE_ONLY_IF_PAID,
+                CheckboxType::class,
+                [
+                    "data" => !!PayPlugModule::getConfigValue(PayPlugConfigValue::SEND_CONFIRMATION_MESSAGE_ONLY_IF_PAID),
+                    "label"=> Translator::getInstance()->trans("Send order confirmation on payment success", [], PayPlugModule::DOMAIN_NAME),
+                    "label_attr" => ['help' => Translator::getInstance()->trans("If checked, the order confirmation message is sent to the customer only when the payment is successful. The order notification is always sent to the shop administrator", [], PayPlugModule::DOMAIN_NAME)],
+                    "required" => false
+                ]
+            )
         ;
     }
 

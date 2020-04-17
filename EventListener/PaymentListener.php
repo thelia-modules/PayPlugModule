@@ -42,8 +42,7 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
                 ->setPaymentUrl($payPlugPayment->hosted_payment->payment_url);
 
         } catch (PayplugException $exception) {
-            $response = json_decode($exception->getHttpResponse(), true);
-            throw new \Exception($response['message']);
+            throw new \Exception($this->formatErrorMessage($exception), 0, $exception);
         }
     }
 
@@ -64,8 +63,7 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
             }
             $payPlugPayment->refund($data);
         } catch (PayplugException $exception) {
-            $response = json_decode($exception->getHttpResponse(), true);
-            throw new \Exception($response['message']);
+            throw new \Exception($this->formatErrorMessage($exception), 0, $exception);
         }
     }
 
@@ -82,8 +80,7 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
 
             $paymentCapture = $payPlugPayment->capture();
         } catch (PayplugException $exception) {
-            $response = json_decode($exception->getHttpResponse(), true);
-            throw new \Exception($response['message']);
+            throw new \Exception($this->formatErrorMessage($exception), 0, $exception);
         }
     }
 
@@ -158,6 +155,19 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
     public function orderCapture(PayPlugPaymentEvent $paymentEvent)
     {
         $this->dispatcher->dispatch(PayPlugPaymentEvent::CREATE_CAPTURE_EVENT, $paymentEvent);
+    }
+
+    protected function formatErrorMessage(PayplugException $exception)
+    {
+        $response = json_decode($exception->getHttpResponse(), true);
+
+        return $response['message'] . implode(' -', array_map(
+            function ($v, $k) {
+                return " [$k] $v";
+            },
+            $response['details'],
+            array_keys($response['details'])
+        ));
     }
 
     /**

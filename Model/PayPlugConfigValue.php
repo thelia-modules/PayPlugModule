@@ -23,6 +23,7 @@ class PayPlugConfigValue
     const DIFFERED_PAYMENT_AUTHORIZED_CAPTURE_STATUS = "differed_payment_authorized_capture_status";
     const DIFFERED_PAYMENT_TRIGGER_CAPTURE_STATUS = "differed_payment_trigger_capture_status";
     const DIFFERED_PAYMENT_CAPTURE_EXPIRED_STATUS = "differed_payment_capture_expired_status";
+    const SEND_CONFIRMATION_MESSAGE_ONLY_IF_PAID = "send_confirmation_message_only_if_paid";
 
     public static function getConfigKeys()
     {
@@ -41,7 +42,8 @@ class PayPlugConfigValue
             self::DIFFERED_PAYMENT_ENABLED,
             self::DIFFERED_PAYMENT_TRIGGER_CAPTURE_STATUS,
             self::DIFFERED_PAYMENT_AUTHORIZED_CAPTURE_STATUS,
-            self::DIFFERED_PAYMENT_CAPTURE_EXPIRED_STATUS
+            self::DIFFERED_PAYMENT_CAPTURE_EXPIRED_STATUS,
+            self::SEND_CONFIRMATION_MESSAGE_ONLY_IF_PAID
         ];
     }
 

@@ -9,7 +9,7 @@ Thelia module for the payment solution PayPlug https://www.payplug.com
 Add it in your main thelia composer.json file
 
 ```
-composer require thelia/pay-plug-module-module:~1.0.0
+composer require thelia/pay-plug-module:~1.0.0
 ```
 
 ## Usage

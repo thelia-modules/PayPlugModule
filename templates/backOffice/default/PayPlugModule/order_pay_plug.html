@@ -9,12 +9,42 @@
                 <th>{intl l="Refund"  d='payplugmodule.bo.default'}</th>
                 <td></td>
                 <td>
+                    {loop type="order" name="refund-order-amount" id=$order_id customer="*" with_prev_next_info="true" backend_context="1"}
+                        {$orderTotalAmount = $TOTAL_TAXED_AMOUNT}
+                        {$orderTotalAmountWithoutShipping = $TOTAL_TAXED_AMOUNT-$POSTAGE}
+                    {/loop}
                     {if $amountRefunded}
-                        {format_money number=$amountRefunded/100}{intl l=" refunded"  d='payplugmodule.bo.default'}
-                    {elseif $isPaid}
-                        <a class="btn btn-block btn-success image-delete" href="#order_refund_dialog" data-toggle="modal">
-                            {intl l="Refund this order" d='payplugmodule.bo.default'}
-                        </a>
+                        <div class="alert alert-info">{format_money number=$amountRefunded/100} {intl l=" refunded"  d='payplugmodule.bo.default'}</div>
+                    {/if}
+                    {if $orderTotalAmount > ($amountRefunded/100) }
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="quick_select_amount_refund">{intl l="What do you want refund" d='payplugmodule.bo.default'}</label>
+                                <select class="form-control" name="" id="quick_select_amount_refund" multiple="true">
+                                        <option value="{$orderTotalAmount}" selected>{intl l="The entire order" d='payplugmodule.bo.default'} ---- {format_money number=$orderTotalAmount currency_id=$CURRENCY}</option>
+                                        <option value="{$orderTotalAmountWithoutShipping}">{intl l="Order without shipping" d='payplugmodule.bo.default'} ----{format_money number=$orderTotalAmountWithoutShipping currency_id=$CURRENCY}</option>
+                                    <optgroup label="{intl l="Products" d='payplugmodule.bo.default'}" >
+                                        {loop type="order_product" name="order-products" order=$order_id}
+                                            <option value="{$REAL_TOTAL_TAXED_PRICE}">[{$PRODUCT_SALE_ELEMENTS_REF}] {$TITLE} ---- {format_money number=$REAL_TOTAL_TAXED_PRICE currency_id=$CURRENCY} </option>
+                                        {/loop}
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="input_amount_refund">{intl l="Adjust amount" d='payplugmodule.bo.default'}</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon glyphicon glyphicon-chevron-right"></span>
+                                    <input id="input_amount_refund" class="form-control" type="number" max="{$orderTotalAmount - $amountRefunded/100}" value="{$orderTotalAmount - $amountRefunded/100}">
+                                    <span class="input-group-addon">{currency attr="symbol"}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for=""></label>
+                                <a class="btn btn-block btn-success image-delete" href="#order_refund_dialog" data-toggle="modal">
+                                    {intl l="Refund" d='payplugmodule.bo.default'}
+                                </a>
+                            </div>
+                        </div>
                     {/if}
                 </td>
             </tr>
@@ -69,7 +99,7 @@
 </div>
 
 {capture "refund_dialog"}
-    {form name="payplugmodule_order_action_form"}
+    {form name="payplugmodule_order_action_form_refund"}
     {form_hidden_fields form=$form}
     {if $form_error}
         <div class="alert alert-danger">{$form_error_message}</div>
@@ -79,6 +109,9 @@
     {/form_field}
     {form_field form=$form field="order_id"}
         <input type="hidden" name="{$name}" value="{$order_id}">
+    {/form_field}
+    {form_field form=$form field="refund_amount"}
+        <input id="refund_amount" type="text" name="{$name}" value="{$orderTotalAmount}">
     {/form_field}
     {/form}
 {/capture}

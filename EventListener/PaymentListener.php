@@ -122,22 +122,32 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
             ->findByOrderId($paymentEvent->getOrder()->getId());
 
         if (count($multiPayments) > 0) {
+            $amountToRefund = $paymentEvent->getAmount();
             foreach ($multiPayments as $multiPayment) {
-                // If already refunded => do nothing
-                if ($multiPayment->getRefundedAt() !== null) {
+                if ($amountToRefund <= 0) {
                     continue;
                 }
+
+                // If already refunded => do nothing
+                if ($multiPayment->getAmountRefunded() >= $multiPayment->getAmount()) {
+                    continue;
+                }
+
                 // If not paid => cancel it
                 if ($multiPayment->getPaidAt() === null) {
                     $multiPayment->setPlannedAt(null)
                         ->save();
                     continue;
                 }
+
+                $currentPaymentAmountToRefund = $multiPayment->getAmount()-$multiPayment->getAmountRefunded();
+                $currentPaymentAmountToRefund = $currentPaymentAmountToRefund > $amountToRefund ? $amountToRefund : $currentPaymentAmountToRefund;
                 // Else refund it
                 $refundPaymentEvent = clone $paymentEvent;
                 $refundPaymentEvent->setPaymentId($multiPayment->getPaymentId())
-                    ->setAmount($multiPayment->getAmount());
+                    ->setAmount($currentPaymentAmountToRefund);
                 $this->dispatcher->dispatch(PayPlugPaymentEvent::CREATE_REFUND_EVENT, $refundPaymentEvent);
+                $amountToRefund = $amountToRefund - $currentPaymentAmountToRefund;
             }
             return;
         }

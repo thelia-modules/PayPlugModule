@@ -63,7 +63,7 @@ CREATE TABLE `order_pay_plug_multi_payment`
     `payment_method` VARCHAR(255),
     `payment_id` VARCHAR(255),
     `paid_at` DATETIME,
-    `refunded_at` DATETIME,
+    `amount_refunded` DECIMAL(16,6) DEFAULT 0,
     PRIMARY KEY (`id`,`order_id`),
     INDEX `order_pay_plug_multi_payment_fi_75704f` (`order_id`),
     CONSTRAINT `order_pay_plug_multi_payment_fk_75704f`

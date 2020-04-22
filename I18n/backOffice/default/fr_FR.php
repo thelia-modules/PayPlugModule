@@ -1,7 +1,8 @@
 <?php
 
 return array(
-    ' refunded' => 'Remboursée',
+    ' refunded' => 'Remboursé',
+    'Adjust amount' => 'Ajuster le montant',
     'Amount' => 'Montant',
     'Canceled' => 'Annulé',
     'Capture order' => 'Déclencher le paiement de cette commande',
@@ -10,6 +11,7 @@ return array(
     'Do you really want to refund this order ?' => 'Voulez vous vraiment rembourser cette commande ?',
     'Force the capture for this order' => 'Forcer le déclenchement du paiement',
     'Multi payment' => 'Paiement en plusieurs fois',
+    'Order without shipping' => 'La commande sans les frais de port',
     'Paid at' => 'Payé le ',
     'PayPlug API configuration' => 'Configuration API PayPlug',
     'PayPlug basic payment configuration' => 'Configuration de paiement basique',
@@ -23,10 +25,12 @@ return array(
     'Payment was captured at ' => 'Paiement déclenché le ',
     'Payments in several times are not guaranteed, a default may occur on future due dates.' => 'Les paiements en plusieurs fois ne sont pas garantis. Un défaut de paiement peut survenir lors des échéances futures.',
     'Planned at' => 'Prévu le ',
-    'Refund' => 'Remoboursement',
+    'Products' => 'Produits',
+    'Refund' => 'Remboursement',
     'Refund order' => 'Rembourser la commande ',
-    'Refund this order' => 'Rembourser cette commande',
     'Refunded at' => 'Remboursé le ',
     'Save' => 'Enregistrer',
+    'The entire order' => 'La commande totale',
     'To trigger the payments on planned date please add a daily cron on this Thelia command ' => 'Pour déclencher les paiements programmés veuillez ajouter cette commande Thelia a un cron journalier ',
+    'What do you want refund' => 'Que voulez-vous rembourser',
 );

@@ -16,6 +16,7 @@ use PayPlugModule\EventListener\FormExtend\OrderFormListener;
 use PayPlugModule\Model\PayPlugConfigValue;
 use PayPlugModule\Service\PaymentService;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Install\Database;
@@ -34,6 +35,24 @@ class PayPlugModule extends AbstractPaymentModule
         if (!$this->getConfigValue('is_initialized', false)) {
             $database = new Database($con);
             $database->insertSql(null, [__DIR__ . "/Config/thelia.sql"]);
+        }
+    }
+
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    {
+        $finder = Finder::create()
+            ->name('*.sql')
+            ->depth(0)
+            ->sortByName()
+            ->in(__DIR__ . DS . 'Config' . DS . 'update');
+
+        $database = new Database($con);
+
+        /** @var \SplFileInfo $file */
+        foreach ($finder as $file) {
+            if (version_compare($currentVersion, $file->getBasename('.sql'), '<')) {
+                $database->insertSql(null, [$file->getPathname()]);
+            }
         }
     }
 

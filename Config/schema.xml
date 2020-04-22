@@ -37,7 +37,7 @@
         <column name="payment_method" type="VARCHAR" size="255" />
         <column name="payment_id" type="VARCHAR" size="255" />
         <column name="paid_at" type="TIMESTAMP" />
-        <column name="refunded_at" type="TIMESTAMP" />
+        <column name="amount_refunded" scale="6" size="16" type="DECIMAL" default="0"/>
 
         <foreign-key foreignTable="order" onDelete="CASCADE" onUpdate="CASCADE">
             <reference local="order_id" foreign="id" />

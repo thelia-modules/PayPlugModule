@@ -18,16 +18,18 @@ class OrderController extends BaseAdminController
             return $response;
         }
 
-        $form = $this->createForm('payplugmodule_order_action_form');
+        $form = $this->createForm('payplugmodule_order_action_form_refund');
 
         try {
             $data = $this->validateForm($form)->getData();
             $order = OrderQuery::create()
                 ->findOneById($data['order_id']);
 
+            $amountToRefund = (int)($data['refund_amount'] * 100);
+
             /** @var PaymentService $paymentService */
             $paymentService = $this->container->get('payplugmodule_payment_service');
-            $paymentService->doOrderRefund($order);
+            $paymentService->doOrderRefund($order, $amountToRefund);
         } catch (\Exception $e) {
             $this->setupFormErrorContext(
                 Translator::getInstance()->trans(

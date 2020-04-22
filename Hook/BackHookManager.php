@@ -12,6 +12,7 @@ use Propel\Runtime\Map\TableMap;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Model\OrderQuery;
+use Thelia\Model\OrderStatus;
 
 class BackHookManager extends BaseHook
 {
@@ -43,13 +44,14 @@ class BackHookManager extends BaseHook
             ->find()
             ->toArray(null, false,TableMap::TYPE_CAMELNAME);
 
+        $isPaid = !in_array($order->getOrderStatus()->getCode(), [OrderStatus::CODE_NOT_PAID, OrderStatus::CODE_CANCELED]);
         $event->add(
             $this->render(
                 'PayPlugModule/order_pay_plug.html',
                 array_merge(
                     $event->getArguments(),
                     [
-                        'isPaid' => $order->isPaid(false),
+                        'isPaid' => $isPaid,
                         'currency' => $order->getCurrency()->getSymbol()
                     ],
                     $orderPayPlugData->toArray(TableMap::TYPE_CAMELNAME),
@@ -59,22 +61,5 @@ class BackHookManager extends BaseHook
                 )
             )
         );
-
-//        if ($order->isPaid()) {
-//            $event->add(
-//                $this->render(
-//                    'PayPlugModule/order_refund_form.html',
-//                    $event->getArguments()
-//                )
-//            );
-//        }
-//        if ($orderPayPlugData->getNeedCapture()) {
-//            $event->add(
-//                $this->render(
-//                    'PayPlugModule/order_capture_data.html',
-//                    array_merge($event->getArguments(), $orderPayPlugData->toArray(TableMap::TYPE_CAMELNAME))
-//                )
-//            );
-//        }
     }
 }

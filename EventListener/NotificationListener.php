@@ -175,7 +175,7 @@ class NotificationListener implements EventSubscriberInterface
             ->findOneByPaymentId($transactionRef);
 
         if (null !== $multiPayment) {
-            $multiPayment->setRefundedAt(new \DateTime())
+            $multiPayment->setAmountRefunded((int)$multiPayment->getAmountRefunded() + $event->getResource()->amount)
                 ->save();
             $order = $multiPayment->getOrder();
         }

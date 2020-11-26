@@ -140,7 +140,7 @@ class PaymentService
         return Notification::treat($request->getContent());
     }
 
-    protected function initAuth()
+    public function initAuth()
     {
         return Payplug::init(
             [

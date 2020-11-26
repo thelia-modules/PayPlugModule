@@ -195,20 +195,6 @@ class NotificationListener implements EventSubscriberInterface
         $this->dispatcher->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
     }
 
-    protected function getOrderFromResource($resource)
-    {
-        $transactionRef = $resource->id;
-
-        if (!$transactionRef) {
-            return null;
-        }
-
-        return OrderQuery::create()
-            ->filterByPaymentModuleId(PayPlugModule::getModuleId())
-            ->filterByTransactionRef($transactionRef)
-            ->findOne();
-    }
-
     /**
      * @inheritDoc
      */

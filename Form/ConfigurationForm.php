@@ -5,15 +5,21 @@ namespace PayPlugModule\Form;
 use PayPlugModule\Model\PayPlugConfigValue;
 use PayPlugModule\PayPlugModule;
 use PayPlugModule\Service\OrderStatusService;
+use PayPlugModule\Model\PayPlugModuleDeliveryTypeQuery;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
+use Thelia\Model\Base\ModuleQuery;
+use Thelia\Model\Module;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Module\BaseModule;
 
 class ConfigurationForm extends BaseForm
 {
+    const DELIVERY_MODULE_TYPE_KEY_PREFIX = "module_delivery_type";
+
     protected function buildForm()
     {
         $orderStatuses = OrderStatusQuery::create()
@@ -203,6 +209,43 @@ class ConfigurationForm extends BaseForm
                 ]
             )
         ;
+
+        foreach (self::getDeliveryModuleFormFields() as $deliveryModuleFormField)
+        {
+            $this->formBuilder
+                ->add(
+                    $deliveryModuleFormField['name'],
+                    ChoiceType::class,
+                    [
+                        'required' => false,
+                        'label' => $deliveryModuleFormField['moduleCode'],
+                        'choices' => [
+                            'carrier' => Translator::getInstance()->trans('Carrier ', [], PayPlugModule::DOMAIN_NAME),
+                            'storepickup' => Translator::getInstance()->trans('Store pick up ', [], PayPlugModule::DOMAIN_NAME),
+                            'networkpickup' => Translator::getInstance()->trans('Network pick up ', [], PayPlugModule::DOMAIN_NAME),
+                            'travelpickup' => Translator::getInstance()->trans('Travel pick up ', [], PayPlugModule::DOMAIN_NAME),
+                            'edelivery' => Translator::getInstance()->trans('E-Delivery ', [], PayPlugModule::DOMAIN_NAME)
+                        ],
+                        'data' => $deliveryModuleFormField['value']
+                    ]
+                );
+        }
+    }
+
+    public static function getDeliveryModuleFormFields()
+    {
+        $deliveryModules = ModuleQuery::create()
+            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->find();
+
+        return array_map(function (Module $deliveryModule) {
+            $oneyModuleDeliveryType = PayPlugModuleDeliveryTypeQuery::create()->filterByModuleId($deliveryModule->getId())->findOne();
+            return [
+                'name' => self::DELIVERY_MODULE_TYPE_KEY_PREFIX.':'.$deliveryModule->getId(),
+                'moduleCode' => $deliveryModule->getCode(),
+                'value' => $oneyModuleDeliveryType !== null ? $oneyModuleDeliveryType->getDeliveryType() : null
+            ];
+        }, iterator_to_array($deliveryModules));
     }
 
     public function getName()

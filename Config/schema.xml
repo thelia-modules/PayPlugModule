@@ -44,5 +44,14 @@
         </foreign-key>
     </table>
 
+    <table name="pay_plug_module_delivery_type" namespace="PayPlugModule\Model">
+        <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+        <column name="module_id" type="integer" />
+        <column name="delivery_type" size="255" type="VARCHAR" />
+        <foreign-key foreignTable="module" name="fk_pay_plug_module_delivery_type_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+            <reference foreign="id" local="module_id" />
+        </foreign-key>
+    </table>
+
     <external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

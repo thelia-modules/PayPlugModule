@@ -171,13 +171,24 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
     {
         $response = json_decode($exception->getHttpResponse(), true);
 
-        return $response['message'] . implode(' -', array_map(
-            function ($v, $k) {
-                return " [$k] $v";
-            },
-            $response['details'],
-            array_keys($response['details'])
-        ));
+        $details = "";
+
+
+        if (isset($response['details'])) {
+            $details = implode(' -', array_map(
+                function ($v, $k) {
+                    $errors = [];
+                    foreach ($v as $field => $error) {
+                        $errors[] = "$field : $error";
+                    }
+                    return " [$k] ".implode(";", $errors)." .";
+                },
+                $response['details'],
+                array_keys($response['details'])
+            ));
+        }
+
+        return $response['message'] . $details;
     }
 
     /**

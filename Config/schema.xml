@@ -16,7 +16,7 @@
     </table>
 
     <table name="pay_plug_card" namespace="PayPlugModule\Model">
-        <column name="uuid" type="VARCHAR" size="255" primaryKey="true"/>
+        <column name="uuid" type="VARCHAR" size="150" primaryKey="true"/>
         <column name="customer_id" type="INTEGER"/>
         <column name="brand" type="VARCHAR" size="255" />
         <column name="last_4" type="VARCHAR" size="255" />

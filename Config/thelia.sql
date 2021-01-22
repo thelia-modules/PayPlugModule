@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `pay_plug_card`;
 
 CREATE TABLE `pay_plug_card`
 (
-    `uuid` VARCHAR(255) NOT NULL,
+    `uuid` VARCHAR(150) NOT NULL,
     `customer_id` INTEGER,
     `brand` VARCHAR(255),
     `last_4` VARCHAR(255),

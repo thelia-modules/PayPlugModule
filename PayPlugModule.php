@@ -19,6 +19,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Install\Database;
 use Thelia\Model\Order;
 use Thelia\Module\AbstractPaymentModule;
@@ -111,9 +112,26 @@ class PayPlugModule extends AbstractPaymentModule
             if ($this->getRequest()->isXmlHttpRequest()) {
                 return new JsonResponse(['error' => $exception->getMessage()], 400);
             }
-            throw $exception;
+            return RedirectResponse::create(URL::getInstance()->absoluteUrl('error'));
         }
 
         return new RedirectResponse($payment['url']);
     }
+
+    public function getHooks()
+    {
+        return [
+            [
+                "type" => TemplateDefinition::BACK_OFFICE,
+                "code" => "payplugmodule.configuration.bottom",
+                "title" => [
+                    "en_US" => "Bottom of PayPlug configuration page",
+                    "fr_FR" => "Bas de la page de configuration PayPlug",
+                ],
+                "block" => false,
+                "active" => true,
+            ]
+        ];
+    }
+
 }

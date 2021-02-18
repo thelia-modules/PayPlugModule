@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `pay_plug_card`;
 
 CREATE TABLE `pay_plug_card`
 (
-    `uuid` VARCHAR(255) NOT NULL,
+    `uuid` VARCHAR(150) NOT NULL,
     `customer_id` INTEGER,
     `brand` VARCHAR(255),
     `last_4` VARCHAR(255),
@@ -70,6 +70,26 @@ CREATE TABLE `order_pay_plug_multi_payment`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
         ON UPDATE CASCADE
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- pay_plug_module_delivery_type
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `pay_plug_module_delivery_type`;
+
+CREATE TABLE `pay_plug_module_delivery_type`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER,
+    `delivery_type` VARCHAR(255),
+    PRIMARY KEY (`id`),
+    INDEX `fi_pay_plug_module_delivery_type_module_id` (`module_id`),
+    CONSTRAINT `fk_pay_plug_module_delivery_type_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

@@ -2,7 +2,9 @@
 
 namespace PayPlugModule\Controller\Admin;
 
+use PayPlugModule\Form\ConfigurationForm;
 use PayPlugModule\Model\PayPlugConfigValue;
+use PayPlugModule\Model\PayPlugModuleDeliveryTypeQuery;
 use PayPlugModule\PayPlugModule;
 use PayPlugModule\Service\OrderStatusService;
 use Thelia\Controller\Admin\BaseAdminController;
@@ -18,9 +20,11 @@ class ConfigurationController extends BaseAdminController
         /** @var OrderStatusService $orderStatusesService */
         $orderStatusesService = $this->container->get('payplugmodule_order_status_service');
         $orderStatusesService->initAllStatuses();
+        $deliveryModuleFormFields = ConfigurationForm::getDeliveryModuleFormFields();
 
         return $this->render(
-            "PayPlugModule/configuration"
+            "PayPlugModule/configuration",
+                compact('deliveryModuleFormFields')
         );
     }
 
@@ -38,6 +42,14 @@ class ConfigurationController extends BaseAdminController
             foreach ($data as $key => $value) {
                 if (in_array($key, PayPlugConfigValue::getConfigKeys())) {
                     PayPlugModule::setConfigValue($key, $value);
+                }
+
+                $explodedKey = explode(':', $key);
+                if ($explodedKey[0] === ConfigurationForm::DELIVERY_MODULE_TYPE_KEY_PREFIX) {
+                    $moduleId = $explodedKey[1];
+                    $payPlugModuleDeliveryType = PayPlugModuleDeliveryTypeQuery::create()->filterByModuleId($moduleId)->findOneOrCreate();
+                    $payPlugModuleDeliveryType->setDeliveryType($value)
+                        ->save();
                 }
             }
 

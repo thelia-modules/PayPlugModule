@@ -4,13 +4,11 @@ namespace PayPlugModule\Event;
 
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
+use PayPlugModule\Model\PayPlugModuleDeliveryTypeQuery;
 use PayPlugModule\PayPlugModule;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Address;
-use Thelia\Model\Cart;
 use Thelia\Model\Order;
-use Thelia\Model\OrderAddress;
 use Thelia\Tools\URL;
 
 class PayPlugPaymentEvent extends ActionEvent
@@ -26,11 +24,22 @@ class PayPlugPaymentEvent extends ActionEvent
     const PARAMETER_DEFINITIONS = [
         'amount' => [
             'type' => 'integer',
-            'access' => 'getFormattedAmount'
+            'access' => 'getFormattedAmount',
+            'accessParameters' => [
+                'amount'
+            ]
         ],
         'authorized_amount' => [
             'type' => 'integer',
-            'access' => 'getFormattedAmount'
+            'access' => 'getFormattedAmount',
+            'accessParameters' => [
+                'authorized_amount'
+            ]
+        ],
+        'auto_capture' => [
+            'type' => 'boolean',
+            'required' => false,
+            'access' => 'autoCapture'
         ],
         'allow_save_card' => [
             'type' => 'boolean',
@@ -99,6 +108,11 @@ class PayPlugPaymentEvent extends ActionEvent
                     'type' => 'string',
                     'required' => true,
                     'access' => 'billingPostcode'
+                ],
+                'company_name' => [
+                    'type' => 'string',
+                    'required' => false,
+                    'access' => 'billingCompany'
                 ],
                 'city' => [
                     'type' => 'string',
@@ -171,6 +185,11 @@ class PayPlugPaymentEvent extends ActionEvent
                     'required' => true,
                     'access' => 'shippingPostcode'
                 ],
+                'company_name' => [
+                    'type' => 'string',
+                    'required' => false,
+                    'access' => 'shippingCompany'
+                ],
                 'city' => [
                     'type' => 'string',
                     'required' => true,
@@ -232,6 +251,63 @@ class PayPlugPaymentEvent extends ActionEvent
             'required' => false,
             'access' => 'notificationUrl'
         ],
+        'payment_context' => [
+            'type' => 'nested',
+            'required' => false,
+            'parameters' => [
+                'cart' => [
+                    'type' => 'array',
+                    'access' => 'products',
+                    'item_definition' => [
+                        'brand' => [
+                            'type' => "string",
+                            'required' => true,
+                            'access' => 'getBrand'
+                        ],
+                        'expected_delivery_date' => [
+                            'type' => "string",
+                            'required' => true,
+                            'access' => "getExpectedDeliveryDate"
+                        ],
+                        'delivery_label' => [
+                            'type' => "string",
+                            'required' => true,
+                            'access' => "getDeliveryLabel"
+                        ],
+                        'delivery_type' => [
+                            'type' => "string",
+                            'required' => true,
+                            'access' => "getDeliveryType"
+                        ],
+                        'merchant_item_id' => [
+                            'type' => "string",
+                            'required' => true,
+                            'access' => "getMerchantItemId"
+                        ],
+                        'name' => [
+                            'type' => "string",
+                            'required' => true,
+                            'access' => "getName"
+                        ],
+                        'price' => [
+                            'type' => "integer",
+                            'required' => true,
+                            'access' => "getPrice"
+                        ],
+                        'quantity' => [
+                            'type' => "integer",
+                            'required' => true,
+                            'access' => "getQuantity"
+                        ],
+                        'total_amount' => [
+                            'type' => "integer",
+                            'required' => true,
+                            'access' => "getTotalAmount"
+                        ]
+                    ]
+                ]
+            ]
+        ],
         'metadata' => [
             'type' => 'nested',
             'parameters' => [
@@ -273,6 +349,11 @@ class PayPlugPaymentEvent extends ActionEvent
      * @var boolean
      */
     protected $capture = false;
+
+    /**
+     * @var boolean
+     */
+    protected $autoCapture = false;
 
     /**
      * @var boolean
@@ -352,6 +433,11 @@ class PayPlugPaymentEvent extends ActionEvent
     /**
      * @var string
      */
+    protected $billingCompany;
+
+    /**
+     * @var string
+     */
     protected $billingCity;
 
     /**
@@ -417,6 +503,11 @@ class PayPlugPaymentEvent extends ActionEvent
     /**
      * @var string
      */
+    protected $shippingCompany;
+
+    /**
+     * @var string
+     */
     protected $shippingCity;
 
     /**
@@ -455,6 +546,11 @@ class PayPlugPaymentEvent extends ActionEvent
     protected $hostedPaymentSentBy;
 
     /**
+     * @var PayPlugProduct[]
+     */
+    protected $products;
+
+    /**
      * @var string
      */
     protected $notificationUrl;
@@ -488,6 +584,14 @@ class PayPlugPaymentEvent extends ActionEvent
 
             // If payment is done retrieve his id on transaction ref
             $this->setPaymentId($order->getTransactionRef());
+
+            $payPlugDeliveryType = PayPlugModuleDeliveryTypeQuery::create()
+                ->filterByModuleId($order->getDeliveryModuleId())
+                ->findOne();
+
+            foreach ($order->getOrderProducts() as $orderProduct) {
+                $this->addProduct((new PayPlugProduct())->buildFromOrderProduct($orderProduct, $payPlugDeliveryType));
+            }
         }
 
         return $this;
@@ -502,9 +606,31 @@ class PayPlugPaymentEvent extends ActionEvent
         return $formattedParameters;
     }
 
-    protected function buildArrayParameters($parameterDefinitions, &$array, $parentKey = null)
+    protected function buildArrayParameters($parameterDefinitions, &$array, $parentKey = null, $target = null)
     {
+        if (null === $target) {
+            $target = $this;
+        }
+
         foreach ($parameterDefinitions as $key => $parameterDefinition) {
+            $access = isset($parameterDefinition['access']) ? $parameterDefinition['access'] : $key;
+
+            if ($parameterDefinition['type'] === 'array') {
+                $targetArray = isset($array[$parentKey]) ? $array[$parentKey] : $array;
+                $targetArray[$key] = [];
+
+                foreach ($target->{$access} as $item) {
+                    $childArray = [];
+                    $this->buildArrayParameters($parameterDefinition['item_definition'], $childArray, $key, $item);
+                    $targetArray[$key][] = $childArray;
+                }
+
+                if (!empty($targetArray[$key])) {
+                    $array = $targetArray;
+                }
+                continue;
+            }
+
             if ($parameterDefinition['type'] === 'nested') {
                 $targetArray = isset($array[$parentKey]) ? $array[$parentKey] : $array;
                 $targetArray[$key] = [];
@@ -517,16 +643,10 @@ class PayPlugPaymentEvent extends ActionEvent
             }
 
             $value = null;
-            $access = isset($parameterDefinition['access']) ? $parameterDefinition['access'] : $key;
-
-            // First check method
-            if (method_exists($this, $access)) {
-                $value = $this->{$access}($key);
-            }
-
-            // If no method check by property
-            if (null === $value) {
-                $value = $this->{$access};
+            $value = property_exists($target, $access) ? $target->{$access} :null;
+            if (null === $value && method_exists($target, $access)) {
+                $parameters = isset($parameterDefinition['accessParameters']) ? $parameterDefinition['accessParameters'] : [];
+                $value = call_user_func([$target, $access], ...$parameters);
             }
 
             // If still null or empty no need to fill this parameter
@@ -538,16 +658,34 @@ class PayPlugPaymentEvent extends ActionEvent
         }
     }
 
-    protected function checkParametersReadyForPayment(array $parameterDefinitions)
+    protected function checkParametersReadyForPayment(array $parameterDefinitions, $target = null)
     {
+        if (null === $target) {
+            $target = $this;
+        }
+
         foreach ($parameterDefinitions as $key => $parameterDefinition) {
-            if ($parameterDefinition['type'] === 'nested') {
-                $this->checkParametersReadyForPayment($parameterDefinition['parameters']);
+            $access = isset($parameterDefinition['access']) ? $parameterDefinition['access'] : $key;
+
+            if ($parameterDefinition['type'] === 'array') {
+                foreach ($target->{$access} as $item) {
+                    $this->checkParametersReadyForPayment($parameterDefinition['item_definition'], $item);
+                }
                 continue;
             }
 
-            $access = isset($parameterDefinition['access']) ? $parameterDefinition['access'] : $key;
-            if (isset($parameterDefinition['required']) && $parameterDefinition['required'] && $this->{$access} == null) {
+            if ($parameterDefinition['type'] === 'nested') {
+                $this->checkParametersReadyForPayment($parameterDefinition['parameters'], $target);
+                continue;
+            }
+
+            $value = property_exists($target, $access) ? $target->{$access} :null;
+            if (null === $value && method_exists($target, $access)) {
+                $parameters = isset($parameterDefinition['accessParameters']) ? $parameterDefinition['accessParameters'] : [];
+                $value = call_user_func([$target, $access], ...$parameters);
+            }
+
+            if (isset($parameterDefinition['required']) && $parameterDefinition['required'] && $value == null) {
                 throw new \Exception(Translator::getInstance()->trans("Invalid payment parameter, %parameter should not be null or empty.", ['%parameter' => $key], PayPlugModule::DOMAIN_NAME));
             }
         }
@@ -579,6 +717,10 @@ class PayPlugPaymentEvent extends ActionEvent
         if (null !== $addressData->getPhone()) {
             $internationalPhoneNumber = $this->formatPhoneNumber($addressData->getPhone(), $addressData->getCountry()->getIsoalpha2());
             $this->{'set'.$addressType.'LandLinePhone'}($internationalPhoneNumber);
+        }
+
+        if (null !== $addressData->getCompany()) {
+            $this->{'set'.$addressType.'Company'}($addressData->getCompany());
         }
     }
 
@@ -708,6 +850,24 @@ class PayPlugPaymentEvent extends ActionEvent
     public function setCapture(bool $capture): PayPlugPaymentEvent
     {
         $this->capture = $capture;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAutoCapture()
+    {
+        return $this->autoCapture;
+    }
+
+    /**
+     * @param bool $autoCapture
+     * @return PayPlugPaymentEvent
+     */
+    public function setAutoCapture(bool $autoCapture): PayPlugPaymentEvent
+    {
+        $this->autoCapture = $autoCapture;
         return $this;
     }
 
@@ -984,6 +1144,24 @@ class PayPlugPaymentEvent extends ActionEvent
     }
 
     /**
+     * @return string|null
+     */
+    public function getBillingCompany()
+    {
+        return $this->billingCompany;
+    }
+
+    /**
+     * @param string $billingCompany
+     * @return PayPlugPaymentEvent
+     */
+    public function setBillingCompany(string $billingCompany): PayPlugPaymentEvent
+    {
+        $this->billingCompany = $billingCompany;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getBillingCity()
@@ -1218,6 +1396,24 @@ class PayPlugPaymentEvent extends ActionEvent
     }
 
     /**
+     * @return string|null
+     */
+    public function getShippingCompany()
+    {
+        return $this->shippingCompany;
+    }
+
+    /**
+     * @param string $shippingCompany
+     * @return PayPlugPaymentEvent
+     */
+    public function setShippingCompany(string $shippingCompany): PayPlugPaymentEvent
+    {
+        $this->shippingCompany = $shippingCompany;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getShippingCity()
@@ -1358,6 +1554,34 @@ class PayPlugPaymentEvent extends ActionEvent
     public function setHostedPaymentSentBy(string $hostedPaymentSentBy): PayPlugPaymentEvent
     {
         $this->hostedPaymentSentBy = $hostedPaymentSentBy;
+        return $this;
+    }
+
+    /**
+     * @return PayPlugProduct[]
+     */
+    public function getProducts(): array
+    {
+        return $this->products;
+    }
+
+    /**
+     * @param PayPlugProduct[] $products
+     * @return PayPlugPaymentEvent
+     */
+    public function setProducts(array $products): PayPlugPaymentEvent
+    {
+        $this->products = $products;
+        return $this;
+    }
+
+    /**
+     * @param PayPlugProduct $product
+     * @return PayPlugPaymentEvent
+     */
+    public function addProduct(PayPlugProduct $product): PayPlugPaymentEvent
+    {
+        $this->products[] = $product;
         return $this;
     }
 

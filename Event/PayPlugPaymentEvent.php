@@ -711,12 +711,16 @@ class PayPlugPaymentEvent extends ActionEvent
 
         if (null !== $addressData->getCellphone()) {
             $internationalPhoneNumber = $this->formatPhoneNumber($addressData->getCellphone(), $addressData->getCountry()->getIsoalpha2());
-            $this->{'set'.$addressType.'MobilePhone'}($internationalPhoneNumber);
+            if (null !== $internationalPhoneNumber) {
+                $this->{'set'.$addressType.'MobilePhone'}($internationalPhoneNumber);
+            }
         }
 
         if (null !== $addressData->getPhone()) {
             $internationalPhoneNumber = $this->formatPhoneNumber($addressData->getPhone(), $addressData->getCountry()->getIsoalpha2());
-            $this->{'set'.$addressType.'LandLinePhone'}($internationalPhoneNumber);
+            if (null !== $internationalPhoneNumber) {
+                $this->{'set' . $addressType . 'LandLinePhone'}($internationalPhoneNumber);
+            }
         }
 
         if (null !== $addressData->getCompany()) {

@@ -312,9 +312,19 @@ class PayPlugPaymentEvent extends ActionEvent
             'type' => 'nested',
             'parameters' => [
                 'customer_id' => [
-                    'type' => 'string',
+                    'type' => 'integer',
                     'required' => false,
                     'access' => 'customerId'
+                ],
+                'transaction_id' => [
+                    'type' => 'integer',
+                    'required' => false,
+                    'access' => 'orderId'
+                ],
+                'transaction_ref' => [
+                    'type' => 'string',
+                    'required' => false,
+                    'access' => 'orderRef'
                 ]
             ]
         ],
@@ -381,9 +391,19 @@ class PayPlugPaymentEvent extends ActionEvent
     protected $currency;
 
     /**
-     * @var string
+     * @var integer
      */
     protected $customerId;
+
+    /**
+     * @var integer
+     */
+    protected $orderId;
+
+    /**
+     * @var string
+     */
+    protected $orderRef;
 
     /**
      * @var string
@@ -561,6 +581,8 @@ class PayPlugPaymentEvent extends ActionEvent
 
         if (null !== $customer = $order->getCustomer()) {
             $this->setCustomerId($customer->getId())
+                ->setOrderId($order->getId())
+                ->setOrderRef($order->getRef())
                 ->setBillingEmail($customer->getEmail())
                 ->setShippingEmail($customer->getEmail());
         }
@@ -968,7 +990,7 @@ class PayPlugPaymentEvent extends ActionEvent
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getCustomerId()
     {
@@ -976,12 +998,48 @@ class PayPlugPaymentEvent extends ActionEvent
     }
 
     /**
-     * @param string $customerId
+     * @param int $customerId
      * @return PayPlugPaymentEvent
      */
-    public function setCustomerId(string $customerId): PayPlugPaymentEvent
+    public function setCustomerId(int $customerId): PayPlugPaymentEvent
     {
         $this->customerId = $customerId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrderId()
+    {
+        return $this->orderId;
+    }
+
+    /**
+     * @param int $orderId
+     * @return PayPlugPaymentEvent
+     */
+    public function setOrderId(int $orderId): PayPlugPaymentEvent
+    {
+        $this->orderId = $orderId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderRef()
+    {
+        return $this->orderRef;
+    }
+
+    /**
+     * @param string $orderRef
+     * @return PayPlugPaymentEvent
+     */
+    public function setOrderRef(string $orderRef): PayPlugPaymentEvent
+    {
+        $this->orderRef = $orderRef;
         return $this;
     }
 

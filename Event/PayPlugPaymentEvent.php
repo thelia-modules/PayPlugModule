@@ -315,6 +315,16 @@ class PayPlugPaymentEvent extends ActionEvent
                     'type' => 'string',
                     'required' => false,
                     'access' => 'customerId'
+                ],
+                'transaction_id' => [
+                    'type' => 'string',
+                    'required' => false,
+                    'access' => 'orderId'
+                ],
+                'transaction_ref' => [
+                    'type' => 'string',
+                    'required' => false,
+                    'access' => 'orderRef'
                 ]
             ]
         ],
@@ -384,6 +394,16 @@ class PayPlugPaymentEvent extends ActionEvent
      * @var string
      */
     protected $customerId;
+
+    /**
+     * @var string
+     */
+    protected $orderId;
+
+    /**
+     * @var string
+     */
+    protected $orderRef;
 
     /**
      * @var string
@@ -561,6 +581,8 @@ class PayPlugPaymentEvent extends ActionEvent
 
         if (null !== $customer = $order->getCustomer()) {
             $this->setCustomerId($customer->getId())
+                ->setOrderId($order->getId())
+                ->setOrderRef($order->getRef())
                 ->setBillingEmail($customer->getEmail())
                 ->setShippingEmail($customer->getEmail());
         }
@@ -982,6 +1004,42 @@ class PayPlugPaymentEvent extends ActionEvent
     public function setCustomerId(string $customerId): PayPlugPaymentEvent
     {
         $this->customerId = $customerId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderId()
+    {
+        return $this->orderId;
+    }
+
+    /**
+     * @param string $orderId
+     * @return PayPlugPaymentEvent
+     */
+    public function setOrderId(string $orderId): PayPlugPaymentEvent
+    {
+        $this->orderId = $orderId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderRef()
+    {
+        return $this->orderRef;
+    }
+
+    /**
+     * @param string $orderRef
+     * @return PayPlugPaymentEvent
+     */
+    public function setOrderRef(string $orderRef): PayPlugPaymentEvent
+    {
+        $this->orderRef = $orderRef;
         return $this;
     }
 

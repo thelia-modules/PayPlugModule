@@ -312,12 +312,12 @@ class PayPlugPaymentEvent extends ActionEvent
             'type' => 'nested',
             'parameters' => [
                 'customer_id' => [
-                    'type' => 'string',
+                    'type' => 'integer',
                     'required' => false,
                     'access' => 'customerId'
                 ],
                 'transaction_id' => [
-                    'type' => 'string',
+                    'type' => 'integer',
                     'required' => false,
                     'access' => 'orderId'
                 ],
@@ -391,12 +391,12 @@ class PayPlugPaymentEvent extends ActionEvent
     protected $currency;
 
     /**
-     * @var string
+     * @var integer
      */
     protected $customerId;
 
     /**
-     * @var string
+     * @var integer
      */
     protected $orderId;
 
@@ -990,7 +990,7 @@ class PayPlugPaymentEvent extends ActionEvent
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getCustomerId()
     {
@@ -998,17 +998,17 @@ class PayPlugPaymentEvent extends ActionEvent
     }
 
     /**
-     * @param string $customerId
+     * @param int $customerId
      * @return PayPlugPaymentEvent
      */
-    public function setCustomerId(string $customerId): PayPlugPaymentEvent
+    public function setCustomerId(int $customerId): PayPlugPaymentEvent
     {
         $this->customerId = $customerId;
         return $this;
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getOrderId()
     {
@@ -1016,10 +1016,10 @@ class PayPlugPaymentEvent extends ActionEvent
     }
 
     /**
-     * @param string $orderId
+     * @param int $orderId
      * @return PayPlugPaymentEvent
      */
-    public function setOrderId(string $orderId): PayPlugPaymentEvent
+    public function setOrderId(int $orderId): PayPlugPaymentEvent
     {
         $this->orderId = $orderId;
         return $this;

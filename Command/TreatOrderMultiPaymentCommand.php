@@ -40,7 +40,7 @@ class TreatOrderMultiPaymentCommand extends ContainerAwareCommand
                ->setPaymentMethod($todayPlannedOrderPayment->getPaymentMethod())
                ->setInitiator("MERCHANT");
 
-           $dispatcher->dispatch(PayPlugPaymentEvent::CREATE_PAYMENT_EVENT, $paymentEvent);
+           $dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::CREATE_PAYMENT_EVENT);
 
            $todayPlannedOrderPayment->setPaymentId($paymentEvent->getPaymentId())
                 ->save();

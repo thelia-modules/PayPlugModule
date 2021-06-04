@@ -17,7 +17,7 @@ class OrderRefundForm extends OrderActionForm
             );
     }
 
-    public function getName()
+    public static function getName()
     {
         return parent::getName().'_refund';
     }

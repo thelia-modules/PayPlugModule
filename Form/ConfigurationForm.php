@@ -9,6 +9,11 @@ use PayPlugModule\Model\PayPlugModuleDeliveryTypeQuery;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormFactoryBuilderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\ValidatorBuilder;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\Base\ModuleQuery;
@@ -27,11 +32,8 @@ class ConfigurationForm extends BaseForm
 
         $orderStatusChoices = [];
         foreach ($orderStatuses as $orderStatus) {
-            $orderStatusChoices[$orderStatus->getId()] = $orderStatus->getTitle();
+            $orderStatusChoices[$orderStatus->getTitle()] = $orderStatus->getId();
         }
-
-        /** @var OrderStatusService $orderStatusesService */
-        $orderStatusesService = $this->container->get('payplugmodule_order_status_service');
 
         $this->formBuilder
             ->add(
@@ -39,9 +41,9 @@ class ConfigurationForm extends BaseForm
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'starter' => 'Starter',
-                        'pro' => 'Pro',
-                        'premium' => 'Premium',
+                        'Starter' => 'starter',
+                        'Pro' => 'pro',
+                        'Premium' => 'premium',
                     ],
                     "data" => PayPlugModule::getConfigValue(PayPlugConfigValue::OFFER),
                     "label"=> Translator::getInstance()->trans("Select your PayPlug offer", [], PayPlugModule::DOMAIN_NAME),
@@ -62,8 +64,8 @@ class ConfigurationForm extends BaseForm
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'live' => 'Live',
-                        'test' => 'Test',
+                        'Live' => 'live',
+                        'Test' => 'test',
                     ],
                     "data" => PayPlugModule::getConfigValue(PayPlugConfigValue::API_MODE),
                     "label"=> Translator::getInstance()->trans("Choose API mode", [], PayPlugModule::DOMAIN_NAME),
@@ -95,8 +97,8 @@ class ConfigurationForm extends BaseForm
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'hosted_page' => Translator::getInstance()->trans("Hosted page", [], PayPlugModule::DOMAIN_NAME),
-                        'lightbox' => Translator::getInstance()->trans("Lightbox", [], PayPlugModule::DOMAIN_NAME),
+                        Translator::getInstance()->trans("Hosted page", [], PayPlugModule::DOMAIN_NAME) => 'hosted_page',
+                        Translator::getInstance()->trans("Lightbox", [], PayPlugModule::DOMAIN_NAME) => 'lightbox',
                         // Todo implement payplug JS
                         //'payplug_js' => Translator::getInstance()->trans("Payplug.js", [], PayPlugModule::DOMAIN_NAME)
                     ],
@@ -131,9 +133,9 @@ class ConfigurationForm extends BaseForm
                 ChoiceType::class,
                 [
                     'choices' => [
-                        '2' => Translator::getInstance()->trans("2 times", [], PayPlugModule::DOMAIN_NAME),
-                        '3' => Translator::getInstance()->trans("3 times", [], PayPlugModule::DOMAIN_NAME),
-                        '4' => Translator::getInstance()->trans("4 times", [], PayPlugModule::DOMAIN_NAME)
+                        Translator::getInstance()->trans("2 times", [], PayPlugModule::DOMAIN_NAME) => '2',
+                        Translator::getInstance()->trans("3 times", [], PayPlugModule::DOMAIN_NAME) => '3',
+                        Translator::getInstance()->trans("4 times", [], PayPlugModule::DOMAIN_NAME) => '4'
                     ],
                     "data" => PayPlugModule::getConfigValue(PayPlugConfigValue::MULTI_PAYMENT_TIMES),
                     "label"=> Translator::getInstance()->trans("Payment in ", [], PayPlugModule::DOMAIN_NAME),
@@ -173,7 +175,7 @@ class ConfigurationForm extends BaseForm
                 ChoiceType::class,
                 [
                     'choices' => $orderStatusChoices,
-                    "data" => PayPlugModule::getConfigValue(PayPlugConfigValue::DIFFERED_PAYMENT_AUTHORIZED_CAPTURE_STATUS, $orderStatusesService->findOrCreateAuthorizedCaptureOrderStatus()->getId()),
+                    "data" => PayPlugModule::getConfigValue(PayPlugConfigValue::DIFFERED_PAYMENT_AUTHORIZED_CAPTURE_STATUS, OrderStatusService::findOrCreateAuthorizedCaptureOrderStatus($this->dispatcher)->getId()),
                     "label"=> Translator::getInstance()->trans("Which status to set when a capture is authorized", [], PayPlugModule::DOMAIN_NAME),
                     "required" => false
                 ]
@@ -193,7 +195,7 @@ class ConfigurationForm extends BaseForm
                 ChoiceType::class,
                 [
                     'choices' => $orderStatusChoices,
-                    "data" => PayPlugModule::getConfigValue(PayPlugConfigValue::DIFFERED_PAYMENT_CAPTURE_EXPIRED_STATUS, $orderStatusesService->findOrCreateExpiredCaptureOrderStatus()->getId()),
+                    "data" => PayPlugModule::getConfigValue(PayPlugConfigValue::DIFFERED_PAYMENT_CAPTURE_EXPIRED_STATUS, OrderStatusService::findOrCreateExpiredCaptureOrderStatus($this->dispatcher)->getId()),
                     "label"=> Translator::getInstance()->trans("What status to set on expired capture ", [], PayPlugModule::DOMAIN_NAME),
                     "required" => false
                 ]
@@ -220,11 +222,11 @@ class ConfigurationForm extends BaseForm
                         'required' => false,
                         'label' => $deliveryModuleFormField['moduleCode'],
                         'choices' => [
-                            'carrier' => Translator::getInstance()->trans('Carrier ', [], PayPlugModule::DOMAIN_NAME),
-                            'storepickup' => Translator::getInstance()->trans('Store pick up ', [], PayPlugModule::DOMAIN_NAME),
-                            'networkpickup' => Translator::getInstance()->trans('Network pick up ', [], PayPlugModule::DOMAIN_NAME),
-                            'travelpickup' => Translator::getInstance()->trans('Travel pick up ', [], PayPlugModule::DOMAIN_NAME),
-                            'edelivery' => Translator::getInstance()->trans('E-Delivery ', [], PayPlugModule::DOMAIN_NAME)
+                            Translator::getInstance()->trans('Carrier ', [], PayPlugModule::DOMAIN_NAME) => 'carrier',
+                            Translator::getInstance()->trans('Store pick up ', [], PayPlugModule::DOMAIN_NAME) => 'storepickup',
+                            Translator::getInstance()->trans('Network pick up ', [], PayPlugModule::DOMAIN_NAME) => 'networkpickup',
+                            Translator::getInstance()->trans('Travel pick up ', [], PayPlugModule::DOMAIN_NAME) => 'travelpickup',
+                            Translator::getInstance()->trans('E-Delivery ', [], PayPlugModule::DOMAIN_NAME) =>  'edelivery'
                         ],
                         'data' => $deliveryModuleFormField['value']
                     ]
@@ -248,7 +250,7 @@ class ConfigurationForm extends BaseForm
         }, iterator_to_array($deliveryModules));
     }
 
-    public function getName()
+    public static function getName()
     {
         return "payplugmodule_configuration_form";
     }

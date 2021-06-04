@@ -26,18 +26,18 @@ class OrderStatusService
 
     public function initAllStatuses()
     {
-        $this->findOrCreateRefundPendingOrderStatus();
-        $this->findOrCreateAuthorizedCaptureOrderStatus();
-        $this->findOrCreateExpiredCaptureOrderStatus();
+        $this->findOrCreateRefundPendingOrderStatus($this->dispatcher);
+        $this->findOrCreateAuthorizedCaptureOrderStatus($this->dispatcher);
+        $this->findOrCreateExpiredCaptureOrderStatus($this->dispatcher);
     }
 
     /**
      * @return \Thelia\Model\OrderStatus
      */
-    public function findOrCreateRefundPendingOrderStatus()
+    public static function findOrCreateRefundPendingOrderStatus(EventDispatcherInterface $eventDispatcher)
     {
         $refundPendingOrderStatus = OrderStatusQuery::create()
-            ->findOneByCode($this::REFUND_PENDING_ORDER_STATUS_CODE);
+            ->findOneByCode(self::REFUND_PENDING_ORDER_STATUS_CODE);
 
         if (null !== $refundPendingOrderStatus) {
             return $refundPendingOrderStatus;
@@ -49,7 +49,7 @@ class OrderStatusService
             ->setLocale('en_US')
             ->setTitle('Refund pending');
 
-        $this->dispatcher->dispatch(TheliaEvents::ORDER_STATUS_CREATE, $refundPendingOrderStatusEvent);
+        $eventDispatcher->dispatch($refundPendingOrderStatusEvent, TheliaEvents::ORDER_STATUS_CREATE);
 
         return $refundPendingOrderStatusEvent->getOrderStatus();
     }
@@ -57,10 +57,10 @@ class OrderStatusService
     /**
      * @return \Thelia\Model\OrderStatus
      */
-    public function findOrCreateAuthorizedCaptureOrderStatus()
+    public static function findOrCreateAuthorizedCaptureOrderStatus(EventDispatcherInterface $eventDispatcher)
     {
         $authorizedCaptureOrderStatus = OrderStatusQuery::create()
-            ->findOneByCode($this::AUTHORIZED_CAPTURE_ORDER_STATUS_CODE);
+            ->findOneByCode(self::AUTHORIZED_CAPTURE_ORDER_STATUS_CODE);
 
         if (null !== $authorizedCaptureOrderStatus) {
             return $authorizedCaptureOrderStatus;
@@ -72,7 +72,7 @@ class OrderStatusService
             ->setLocale('en_US')
             ->setTitle('Authorized capture');
 
-        $this->dispatcher->dispatch(TheliaEvents::ORDER_STATUS_CREATE, $authorizedCaptureOrderStatus);
+        $eventDispatcher->dispatch($authorizedCaptureOrderStatus, TheliaEvents::ORDER_STATUS_CREATE);
 
         return $authorizedCaptureOrderStatus->getOrderStatus();
     }
@@ -80,10 +80,10 @@ class OrderStatusService
     /**
      * @return \Thelia\Model\OrderStatus
      */
-    public function findOrCreateExpiredCaptureOrderStatus()
+    public static function findOrCreateExpiredCaptureOrderStatus(EventDispatcherInterface $eventDispatcher)
     {
         $expiredCaptureOrderStatus = OrderStatusQuery::create()
-            ->findOneByCode($this::EXPIRED_CAPTURE_ORDER_STATUS_CODE);
+            ->findOneByCode(self::EXPIRED_CAPTURE_ORDER_STATUS_CODE);
 
         if (null !== $expiredCaptureOrderStatus) {
             return $expiredCaptureOrderStatus;
@@ -95,7 +95,7 @@ class OrderStatusService
             ->setLocale('en_US')
             ->setTitle('Expired capture');
 
-        $this->dispatcher->dispatch(TheliaEvents::ORDER_STATUS_CREATE, $expiredCaptureOrderStatus);
+        $eventDispatcher->dispatch($expiredCaptureOrderStatus, TheliaEvents::ORDER_STATUS_CREATE);
 
         return $expiredCaptureOrderStatus->getOrderStatus();
     }

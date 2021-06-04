@@ -69,7 +69,7 @@ class ConfirmationEmailListener implements EventSubscriberInterface
         if ($order->isPaid() && $order->getPaymentModuleId() == PayPlugModule::getModuleId()) {
             // Send confirmation email if required.
             if (PayPlugModule::getConfigValue('send_confirmation_message_only_if_paid')) {
-                $dispatcher->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, $event);
+                $dispatcher->dispatch($event, TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL);
             }
 
             Tlog::getInstance()->debug("Confirmation email sent to customer " . $order->getCustomer()->getEmail());

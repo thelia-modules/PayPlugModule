@@ -2,6 +2,8 @@
 
 namespace PayPlugModule\Controller\Admin;
 
+use PayPlugModule\Form\OrderActionForm;
+use PayPlugModule\Form\OrderRefundForm;
 use PayPlugModule\PayPlugModule;
 use PayPlugModule\Service\PaymentService;
 use Thelia\Controller\Admin\BaseAdminController;
@@ -12,13 +14,13 @@ use Thelia\Model\OrderQuery;
 
 class OrderController extends BaseAdminController
 {
-    public function refundAction()
+    public function refundAction(PaymentService $paymentService)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), 'PayPlugModule', AccessManager::UPDATE)) {
             return $response;
         }
 
-        $form = $this->createForm('payplugmodule_order_action_form_refund');
+        $form = $this->createForm(OrderRefundForm::getName());
 
         try {
             $data = $this->validateForm($form)->getData();
@@ -27,8 +29,6 @@ class OrderController extends BaseAdminController
 
             $amountToRefund = (int)($data['refund_amount'] * 100);
 
-            /** @var PaymentService $paymentService */
-            $paymentService = $this->container->get('payplugmodule_payment_service');
             $paymentService->doOrderRefund($order, $amountToRefund);
         } catch (\Exception $e) {
             $this->setupFormErrorContext(
@@ -48,21 +48,19 @@ class OrderController extends BaseAdminController
         return $this->generateRedirect($url.'#orderPayPlug');
     }
 
-    public function captureAction()
+    public function captureAction(PaymentService $paymentService)
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), 'PayPlugModule', AccessManager::UPDATE)) {
             return $response;
         }
 
-        $form = $this->createForm('payplugmodule_order_action_form');
+        $form = $this->createForm(OrderActionForm::getName());
 
         try {
             $data = $this->validateForm($form)->getData();
             $order = OrderQuery::create()
                 ->findOneById($data['order_id']);
 
-            /** @var PaymentService $paymentService */
-            $paymentService = $this->container->get('payplugmodule_payment_service');
             $paymentService->doOrderCapture($order);
         } catch (\Exception $e) {
             $this->setupFormErrorContext(

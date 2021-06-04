@@ -45,11 +45,11 @@ class NotificationListener implements EventSubscriberInterface
         switch(true) {
             case $resource instanceof Payment:
                 $paymentNotificationEvent = new PaymentNotificationEvent($resource);
-                $this->dispatcher->dispatch(PaymentNotificationEvent::PAYMENT_NOTIFICATION_EVENT, $paymentNotificationEvent);
+                $this->dispatcher->dispatch($paymentNotificationEvent, PaymentNotificationEvent::PAYMENT_NOTIFICATION_EVENT);
                 break;
             case $resource instanceof Refund:
                 $refundNotificationEvent = new RefundNotificationEvent($resource);
-                $this->dispatcher->dispatch(RefundNotificationEvent::REFUND_NOTIFICATION_EVENT, $refundNotificationEvent);
+                $this->dispatcher->dispatch($refundNotificationEvent, RefundNotificationEvent::REFUND_NOTIFICATION_EVENT);
                 break;
         }
     }
@@ -110,7 +110,7 @@ class NotificationListener implements EventSubscriberInterface
         if (null !== $orderStatusId) {
             $event = (new OrderEvent($order))
                 ->setStatus($orderStatusId);
-            $this->dispatcher->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+            $this->dispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
         }
 
         if (null !== $paymentResource->card->id) {
@@ -151,7 +151,7 @@ class NotificationListener implements EventSubscriberInterface
                 if ($orderMultiPayment->getIsFirstPayment()) {
                     $event = (new OrderEvent($order))
                         ->setStatus($orderStatusId);
-                    $this->dispatcher->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+                    $this->dispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
                 }
             }
 
@@ -192,7 +192,7 @@ class NotificationListener implements EventSubscriberInterface
 
         $event = (new OrderEvent($order))
             ->setStatus(OrderStatusQuery::getRefundedStatus()->getId());
-        $this->dispatcher->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
+        $this->dispatcher->dispatch($event, TheliaEvents::ORDER_UPDATE_STATUS);
     }
 
     /**

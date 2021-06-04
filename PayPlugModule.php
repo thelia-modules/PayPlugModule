@@ -16,6 +16,7 @@ use PayPlugModule\EventListener\FormExtend\OrderFormListener;
 use PayPlugModule\Model\PayPlugConfigValue;
 use PayPlugModule\Service\PaymentService;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\HttpFoundation\JsonResponse;
@@ -31,7 +32,7 @@ class PayPlugModule extends AbstractPaymentModule
     const DOMAIN_NAME = 'payplugmodule';
 
 
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
         if (!$this->getConfigValue('is_initialized', false)) {
             $database = new Database($con);
@@ -39,7 +40,7 @@ class PayPlugModule extends AbstractPaymentModule
         }
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
     {
         $finder = Finder::create()
             ->name('*.sql')
@@ -134,4 +135,11 @@ class PayPlugModule extends AbstractPaymentModule
         ];
     }
 
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
+    }
 }

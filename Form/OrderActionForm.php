@@ -16,7 +16,7 @@ class OrderActionForm extends BaseForm
             );
     }
 
-    public function getName()
+    public static function getName()
     {
         return "payplugmodule_order_action_form";
     }

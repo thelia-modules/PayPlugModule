@@ -91,7 +91,7 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
      */
     public function orderPayment(PayPlugPaymentEvent $paymentEvent)
     {
-        $this->dispatcher->dispatch(PayPlugPaymentEvent::CREATE_PAYMENT_EVENT, $paymentEvent);
+        $this->dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::CREATE_PAYMENT_EVENT);
 
         $order = $paymentEvent->getOrder();
 
@@ -106,7 +106,7 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
 
         $orderEvent = new OrderEvent($paymentEvent->getOrder());
         $orderEvent->setTransactionRef($paymentEvent->getPaymentId());
-        $this->dispatcher->dispatch(TheliaEvents::ORDER_UPDATE_TRANSACTION_REF, $orderEvent);
+        $this->dispatcher->dispatch($orderEvent, TheliaEvents::ORDER_UPDATE_TRANSACTION_REF);
     }
 
     /**
@@ -146,13 +146,13 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
                 $refundPaymentEvent = clone $paymentEvent;
                 $refundPaymentEvent->setPaymentId($multiPayment->getPaymentId())
                     ->setAmount($currentPaymentAmountToRefund);
-                $this->dispatcher->dispatch(PayPlugPaymentEvent::CREATE_REFUND_EVENT, $refundPaymentEvent);
+                $this->dispatcher->dispatch($refundPaymentEvent, PayPlugPaymentEvent::CREATE_REFUND_EVENT);
                 $amountToRefund = $amountToRefund - $currentPaymentAmountToRefund;
             }
             return;
         }
 
-        $this->dispatcher->dispatch(PayPlugPaymentEvent::CREATE_REFUND_EVENT, $paymentEvent);
+        $this->dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::CREATE_REFUND_EVENT);
     }
 
     /**
@@ -164,7 +164,7 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
      */
     public function orderCapture(PayPlugPaymentEvent $paymentEvent)
     {
-        $this->dispatcher->dispatch(PayPlugPaymentEvent::CREATE_CAPTURE_EVENT, $paymentEvent);
+        $this->dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::CREATE_CAPTURE_EVENT);
     }
 
     protected function formatErrorMessage(PayplugException $exception)

@@ -14,11 +14,8 @@ use Thelia\Core\Translation\Translator;
 
 class ConfigurationController extends BaseAdminController
 {
-    public function viewAction()
+    public function viewAction(OrderStatusService $orderStatusesService)
     {
-        // Create default order statuses
-        /** @var OrderStatusService $orderStatusesService */
-        $orderStatusesService = $this->container->get('payplugmodule_order_status_service');
         $orderStatusesService->initAllStatuses();
         $deliveryModuleFormFields = ConfigurationForm::getDeliveryModuleFormFields();
 
@@ -34,7 +31,7 @@ class ConfigurationController extends BaseAdminController
             return $response;
         }
 
-        $form = $this->createForm('payplugmodule_configuration_form');
+        $form = $this->createForm(ConfigurationForm::getName());
 
         try {
             $data = $this->validateForm($form)->getData();

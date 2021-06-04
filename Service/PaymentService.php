@@ -93,7 +93,7 @@ class PaymentService
             }
         }
 
-        $this->dispatcher->dispatch(PayPlugPaymentEvent::ORDER_PAYMENT_EVENT, $paymentEvent);
+        $this->dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::ORDER_PAYMENT_EVENT);
 
         if (null !== $firstPayment) {
             $firstPayment->setPaymentId($paymentEvent->getPaymentId())
@@ -120,7 +120,7 @@ class PaymentService
         $paymentEvent = (new PayPlugPaymentEvent())
             ->buildFromOrder($order);
 
-        $this->dispatcher->dispatch(PayPlugPaymentEvent::ORDER_CAPTURE_EVENT, $paymentEvent);
+        $this->dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::ORDER_CAPTURE_EVENT);
     }
 
     public function doOrderRefund(Order $order, int $amountRefund = null)
@@ -132,7 +132,7 @@ class PaymentService
             $paymentEvent->setAmount($amountRefund);
         }
 
-        $this->dispatcher->dispatch(PayPlugPaymentEvent::ORDER_REFUND_EVENT, $paymentEvent);
+        $this->dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::ORDER_REFUND_EVENT);
     }
 
     public function getNotificationResource(Request $request)

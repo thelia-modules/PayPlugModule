@@ -123,7 +123,7 @@
         <input type="hidden" name="{$name}" value="{$order_id}">
     {/form_field}
     {form_field form=$form field="refund_amount"}
-        <input id="refund_amount" type="hidden" name="{$name}" value="{$orderTotalAmount}">
+        <input id="refund_amount" type="hidden" name="{$name}" value="{$orderTotalAmount|default:null}">
     {/form_field}
     {/form}
 {/capture}

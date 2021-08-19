@@ -62,4 +62,9 @@ class BackHookManager extends BaseHook
             )
         );
     }
+
+    public function onModuleConfigure(HookRenderEvent $event)
+    {
+
+    }
 }

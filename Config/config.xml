@@ -27,6 +27,7 @@
 
     <hooks>
         <hook id="payplugmodule_back_hook" class="PayPlugModule\Hook\BackHookManager">
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfigure" />
             <tag name="hook.event_listener" event="order-edit.payment-module-bottom" type="back" method="onOrderEditPaymentModuleBottom"/>
             <tag name="hook.event_listener" event="order.edit-js " type="back" templates="js:PayPlugModule/order_pay_plug.js"/>
         </hook>

@@ -5,6 +5,7 @@ namespace PayPlugModule\Controller;
 use PayPlugModule\Model\PayPlugCardQuery;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Tools\URL;
 
 class CardController extends BaseFrontController
 {
@@ -16,7 +17,7 @@ class CardController extends BaseFrontController
             $card->delete();
         }
 
-        return $this->generateRedirect($this->getSession()->getReturnToUrl());
+        return $this->generateRedirect(URL::getInstance()->absoluteUrl('/order/invoice'));
     }
 
 }

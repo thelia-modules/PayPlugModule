@@ -60,6 +60,10 @@ class PayPlugModule extends AbstractPaymentModule
 
     public function isValidPayment()
     {
+        if ($this->getCurrentOrderTotalAmount() < 1) {
+            return false;
+        }
+
         /** @var PaymentService $paymentService */
         $paymentService = $this->container->get('payplugmodule_payment_service');
         return $paymentService->isPayPlugAvailable();

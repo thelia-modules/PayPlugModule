@@ -614,6 +614,28 @@ class PayPlugPaymentEvent extends ActionEvent
             foreach ($order->getOrderProducts() as $orderProduct) {
                 $this->addProduct((new PayPlugProduct())->buildFromOrderProduct($orderProduct, $payPlugDeliveryType));
             }
+
+            switch ($payPlugDeliveryType) {
+                case "carrier":
+                    $shippingDeliveryType = $order->getChoosenDeliveryAddress() !== $order->getChoosenInvoiceAddress() ? "NEW" : "BILLING";
+                    break;
+                case "storepickup":
+                    $shippingDeliveryType = "SHIP_TO_STORE";
+                    break;
+                case "networkpickup":
+                    $shippingDeliveryType = "VERIFIED";
+                    break;
+                case "travelpickup":
+                    $shippingDeliveryType = "TRAVEL_OR_EVENT";
+                    break;
+                case "edelivery":
+                    $shippingDeliveryType = "DIGITAL_GOODS";
+                    break;
+                default:
+                    $shippingDeliveryType = "BILLING";
+            }
+
+            $this->setShippingDeliveryType($shippingDeliveryType);
         }
 
         return $this;

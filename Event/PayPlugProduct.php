@@ -4,6 +4,7 @@ namespace PayPlugModule\Event;
 
 use PayPlugModule\Model\PayPlugModuleDeliveryType;
 use PayPlugModule\PayPlugModule;
+use PayPlugOney\PayPlugOney;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\OrderProduct;
 use Thelia\Model\Base\OrderProductTax;
@@ -50,6 +51,12 @@ class PayPlugProduct
         );
 
         $deliveryType = $payPlugModuleDeliveryType !== null ? $payPlugModuleDeliveryType->getDeliveryType() : 'carrier';
+
+        // For oney payments force the delivery type to 'storepickup'
+        if (class_exists(PayPlugOney::class) && $orderProduct->getOrder()->getPaymentModuleInstance()->getCode() === PayPlugOney::getModuleCode()) {
+            $deliveryType = 'storepickup';
+        }
+
         // Brand can't be find from order product but it's required so set store name as brand or "Unknown"
         $this->setBrand($storeName);
         $this->setExpectedDeliveryDate(date('Y-m-d'));

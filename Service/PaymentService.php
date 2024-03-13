@@ -142,6 +142,10 @@ class PaymentService
 
     public function initAuth()
     {
+        if (null === PayPlugConfigValue::getApiKey()) {
+            throw new \Exception("PayPlug API key is not set");
+        }
+
         return Payplug::init(
             [
                 'secretKey' => PayPlugConfigValue::getApiKey(),

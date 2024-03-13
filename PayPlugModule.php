@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Install\Database;
+use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Module\AbstractPaymentModule;
 use Thelia\Tools\URL;
@@ -64,9 +65,15 @@ class PayPlugModule extends AbstractPaymentModule
             return false;
         }
 
-        /** @var PaymentService $paymentService */
-        $paymentService = $this->container->get('payplugmodule_payment_service');
-        return $paymentService->isPayPlugAvailable();
+        try {
+            /** @var PaymentService $paymentService */
+            $paymentService = $this->container->get('payplugmodule_payment_service');
+
+            return $paymentService->isPayPlugAvailable();
+        } catch (\Exception $e) {
+            Tlog::getInstance()->addError("Error during Payplug validation check : ".$e->getMessage());
+            return false;
+        }
     }
 
     /**

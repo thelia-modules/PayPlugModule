@@ -612,7 +612,9 @@ class PayPlugPaymentEvent extends ActionEvent
                 ->findOne();
 
             foreach ($order->getOrderProducts() as $orderProduct) {
-                $this->addProduct((new PayPlugProduct())->buildFromOrderProduct($orderProduct, $payPlugDeliveryType));
+                if($orderProduct->getPrice() > 0 ){
+                    $this->addProduct((new PayPlugProduct())->buildFromOrderProduct($orderProduct, $payPlugDeliveryType));
+                }
             }
         }
 

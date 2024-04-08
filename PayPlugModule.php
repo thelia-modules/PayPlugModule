@@ -82,6 +82,7 @@ class PayPlugModule extends AbstractPaymentModule
     public function pay(Order $order)
     {
         try {
+
             /** @var PaymentService $paymentService */
             $paymentService = $this->container->get('payplugmodule_payment_service');
 
@@ -90,7 +91,6 @@ class PayPlugModule extends AbstractPaymentModule
             $isMultiPayment = $this->getRequest()->getSession()->get(OrderFormListener::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 0);
             if ($isMultiPayment) {
                 $orderTotalAmount = $order->getTotalAmount();
-
                 $minAmount = PayPlugModule::getConfigValue(PayPlugConfigValue::MULTI_PAYMENT_MINIMUM);
                 $maxAmount = PayPlugModule::getConfigValue(PayPlugConfigValue::MULTI_PAYMENT_MAXIMUM);
 
@@ -124,6 +124,7 @@ class PayPlugModule extends AbstractPaymentModule
             if ($this->getRequest()->isXmlHttpRequest()) {
                 return new JsonResponse(['error' => $exception->getMessage()], 400);
             }
+            Tlog::getInstance()->addError('Error PayPlugModule::pay() : '. $exception->getMessage());
             return new RedirectResponse(URL::getInstance()->absoluteUrl('error'));
         }
 

@@ -3,7 +3,6 @@
 namespace PayPlugModule\Service;
 
 use Payplug\Notification;
-use Payplug\Payment;
 use Payplug\Payplug;
 use PayPlugModule\Event\PayPlugPaymentEvent;
 use PayPlugModule\Model\OrderPayPlugMultiPayment;
@@ -30,13 +29,6 @@ class PaymentService
     public function isPayPlugAvailable()
     {
         if (!PayPlugModule::getConfigValue(PayPlugConfigValue::PAYMENT_ENABLED, false)) {
-            return false;
-        }
-
-        // Check API availability
-        try {
-            Payment::listPayments(1);
-        } catch (\Exception $exception) {
             return false;
         }
 

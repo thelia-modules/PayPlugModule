@@ -124,7 +124,9 @@ class PayPlugModule extends AbstractPaymentModule
             if ($this->getRequest()->isXmlHttpRequest()) {
                 return new JsonResponse(['error' => $exception->getMessage()], 400);
             }
-            Tlog::getInstance()->addError('Error PayPlugModule::pay() : '. $exception->getMessage());
+            Tlog::getInstance()->addError(
+                'Error PayPlugModule::pay() : ' . $exception->getMessage() 
+            );
             return new RedirectResponse(URL::getInstance()->absoluteUrl('error'));
         }
 

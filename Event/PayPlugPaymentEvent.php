@@ -262,7 +262,8 @@ class PayPlugPaymentEvent extends ActionEvent
                         'brand' => [
                             'type' => "string",
                             'required' => true,
-                            'access' => 'getBrand'
+                            'access' => 'getBrand',
+                            'maxLength' => 100
                         ],
                         'expected_delivery_date' => [
                             'type' => "string",
@@ -272,7 +273,8 @@ class PayPlugPaymentEvent extends ActionEvent
                         'delivery_label' => [
                             'type' => "string",
                             'required' => true,
-                            'access' => "getDeliveryLabel"
+                            'access' => "getDeliveryLabel",
+                            'maxLength' => 100
                         ],
                         'delivery_type' => [
                             'type' => "string",
@@ -666,11 +668,13 @@ class PayPlugPaymentEvent extends ActionEvent
                 continue;
             }
 
-            $value = null;
             $value = property_exists($target, $access) ? $target->{$access} :null;
             if (null === $value && method_exists($target, $access)) {
                 $parameters = isset($parameterDefinition['accessParameters']) ? $parameterDefinition['accessParameters'] : [];
                 $value = call_user_func([$target, $access], ...$parameters);
+            }
+            if (isset($parameterDefinition['maxLength']) && strlen($value) > $parameterDefinition['maxLength']) {
+                $value = substr($value, 0, $parameterDefinition['maxLength']);
             }
 
             // If still null or empty no need to fill this parameter

@@ -173,15 +173,14 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
 
         $details = "";
 
-
         if (isset($response['details'])) {
             $details = implode(' -', array_map(
                 function ($v, $k) {
-                    $errors = [];
-                    foreach ($v as $field => $error) {
-                        $errors[] = "$field : $error";
+                    if (is_array($v)) {
+                        return " [$k] " . $this->processArray($v) . " .";
                     }
-                    return " [$k] ".implode(";", $errors)." .";
+
+                    return " [$k] $v .";
                 },
                 $response['details'],
                 array_keys($response['details'])
@@ -189,6 +188,19 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
         }
 
         return $response['message'] . $details;
+    }
+
+    private function processArray($array): string
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result[] = $this->processArray($value);
+            } else {
+                $result[] = "$key : $value";
+            }
+        }
+        return implode(";", $result);
     }
 
     /**

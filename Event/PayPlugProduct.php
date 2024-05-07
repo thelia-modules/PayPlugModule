@@ -50,10 +50,17 @@ class PayPlugProduct
         );
 
         $deliveryType = $payPlugModuleDeliveryType !== null ? $payPlugModuleDeliveryType->getDeliveryType() : 'carrier';
-        // Brand can't be find from order product but it's required so set store name as brand or "Unknown"
         $this->setBrand($storeName);
         $this->setExpectedDeliveryDate(date('Y-m-d'));
-        $this->setDeliveryLabel($storeName);
+        $deliveryLabel = $storeName;
+        $order = $orderProduct->getOrder();
+        if (null !== $order) {
+            $deliveryLabelModule = $order->getDeliveryModuleInstance()->getCode();
+            if($deliveryLabelModule !== null) {
+                $deliveryLabel = $deliveryLabelModule;
+            }
+        }
+        $this->setDeliveryLabel($deliveryLabel);
         $this->setDeliveryType($deliveryType);
         $this->setMerchantItemId($orderProduct->getId());
         $this->setName($orderProduct->getTitle());

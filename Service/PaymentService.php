@@ -33,13 +33,6 @@ class PaymentService
             return false;
         }
 
-        // Check API availability
-        try {
-            Payment::listPayments(1);
-        } catch (\Exception $exception) {
-            return false;
-        }
-
         return true;
     }
 

@@ -591,7 +591,7 @@ class PayPlugPaymentEvent extends ActionEvent
 
         if (null !== $order) {
             // Avoid php bad int cast https://www.php.net/manual/fr/function.intval.php#60793
-            $orderAmount = $order->getTotalAmount() * 100;
+            $orderAmount = round($order->getTotalAmount(),2) * 100;
             $this->setAmount(intval("$orderAmount"))
                 ->setCurrency($order->getCurrency()->getCode());
 

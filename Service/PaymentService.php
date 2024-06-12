@@ -44,10 +44,11 @@ class PaymentService
         Order $order,
         bool $capture = false,
         bool $allowSaveCard = false,
-        int $paymentSlice = 1
+        int $paymentSlice = 1,
+        float $totalOrder
     ) {
         $paymentEvent = (new PayPlugPaymentEvent())
-            ->buildFromOrder($order)
+            ->buildFromOrder($order,$totalOrder)
             ->setCapture($capture)
             ->setAllowSaveCard($allowSaveCard);
 

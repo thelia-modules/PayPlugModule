@@ -577,7 +577,7 @@ class PayPlugPaymentEvent extends ActionEvent
      */
     protected $notificationUrl;
 
-    public function buildFromOrder(Order $order)
+    public function buildFromOrder(Order $order, ?float $customTotalAmount = null)
     {
         $this->order = $order;
 
@@ -591,7 +591,7 @@ class PayPlugPaymentEvent extends ActionEvent
 
         if (null !== $order) {
             // Avoid php bad int cast https://www.php.net/manual/fr/function.intval.php#60793
-            $orderAmount = round($order->getTotalAmount(),2) * 100;
+            $orderAmount = round($customTotalAmount??$order->getTotalAmount(),2) * 100;
             $this->setAmount(intval("$orderAmount"))
                 ->setCurrency($order->getCurrency()->getCode());
 

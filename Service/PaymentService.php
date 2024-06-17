@@ -53,9 +53,13 @@ class PaymentService
             ->setAllowSaveCard($allowSaveCard);
 
         if (null !== $card = PayPlugCardQuery::create()->findOneByCustomerId($order->getCustomerId())) {
-            $paymentEvent->setPaymentMethod($card->getUuid())
-                ->setInitiator('PAYER')
-                ->setAllowSaveCard(false);
+            $todayDate = date("Y-m");
+            $expireDate = date("Y-m", strtotime($card->getExpireYear().'-'.$card->getExpireMonth()));
+            if ($expireDate > $todayDate){
+                $paymentEvent->setPaymentMethod($card->getUuid())
+                    ->setInitiator('PAYER')
+                    ->setAllowSaveCard(false);
+            }
         }
 
         $firstPayment = null;

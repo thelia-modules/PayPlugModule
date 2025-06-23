@@ -53,5 +53,15 @@
         </foreign-key>
     </table>
 
+
+    <table name="pay_plug_notification_history" namespace="PayPlugModule\Model">
+        <column name="uuid" type="VARCHAR" size="150" primaryKey="true"/>
+        <column name="order_id" type="INTEGER" required="true" primaryKey="true"/>
+        <foreign-key foreignTable="order" onDelete="CASCADE" onUpdate="CASCADE">
+            <reference local="order_id" foreign="id" />
+        </foreign-key>
+        <behavior name="timestampable" />
+    </table>
+
     <external-schema filename="local/config/schema.xml" referenceOnly="true" />
 </database>

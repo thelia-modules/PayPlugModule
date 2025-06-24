@@ -37,7 +37,7 @@ class PayPlugModule extends AbstractPaymentModule
     {
         if (!$this->getConfigValue('is_initialized', false)) {
             $database = new Database($con);
-            $database->insertSql(null, [__DIR__ . "/Config/thelia.sql"]);
+            $database->insertSql(null, [__DIR__ . "/Config/TheliaMain.sql"]);
         }
     }
 

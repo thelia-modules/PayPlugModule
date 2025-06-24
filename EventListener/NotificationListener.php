@@ -14,6 +14,8 @@ use PayPlugModule\Model\OrderPayPlugMultiPaymentQuery;
 use PayPlugModule\Model\PayPlugCard;
 use PayPlugModule\Model\PayPlugCardQuery;
 use PayPlugModule\Model\PayPlugConfigValue;
+use PayPlugModule\Model\PayPlugNotificationHistory;
+use PayPlugModule\Model\PayPlugNotificationHistoryQuery;
 use PayPlugModule\PayPlugModule;
 use PayPlugModule\Service\OrderStatusService;
 use Propel\Runtime\Collection\Collection;
@@ -21,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
@@ -164,10 +167,19 @@ class NotificationListener implements EventSubscriberInterface
         if (!$transactionRef) {
             return;
         }
-
+        $id = $event->getResource()->id;
         $order =  OrderQuery::create()
             ->filterByTransactionRef($transactionRef)
             ->findOne();
+
+        $notificationHistory = PayPlugNotificationHistoryQuery::create()
+            ->filterByUuid($id)
+            ->findOne();
+
+        if (!!$notificationHistory) {
+            Tlog::getInstance()->addAlert("Notification '{$id}' already exist");
+            return;
+        }
 
         $multiPayment = OrderPayPlugMultiPaymentQuery::create()
             ->findOneByPaymentId($transactionRef);
@@ -181,6 +193,8 @@ class NotificationListener implements EventSubscriberInterface
         if (null === $order) {
             return;
         }
+
+        (new PayPlugNotificationHistory())->setUuid($id)->setOrderId($order->getId())->save();
 
         $orderPayPlugData = OrderPayPlugDataQuery::create()
             ->findOneById($order->getId());

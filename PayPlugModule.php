@@ -19,6 +19,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Install\Database;

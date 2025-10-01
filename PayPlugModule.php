@@ -59,7 +59,7 @@ class PayPlugModule extends AbstractPaymentModule
         }
     }
 
-    public function isValidPayment(): bool;
+    public function isValidPayment(): bool
     {
         if ($this->getCurrentOrderTotalAmount() < 1) {
             return false;
@@ -79,7 +79,7 @@ class PayPlugModule extends AbstractPaymentModule
     /**
      * @inheritDoc
      */
-    public function pay(Order $order): ?Response;
+    public function pay(Order $order): ?Response
     {
         try {
 

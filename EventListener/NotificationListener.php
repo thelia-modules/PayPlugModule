@@ -65,6 +65,7 @@ class NotificationListener implements EventSubscriberInterface
         }
 
         $order = OrderQuery::create()
+            ->filterByPaymentModuleId(PayPlugModule::getModuleId())
             ->filterByTransactionRef($transactionRef)
             ->findOne();
 

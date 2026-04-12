@@ -250,7 +250,7 @@ class ConfigurationForm extends BaseForm
         }, iterator_to_array($deliveryModules));
     }
 
-    public static function getName()
+    public static function getName(): string
     {
         return "payplugmodule_configuration_form";
     }

@@ -210,7 +210,7 @@ class NotificationListener implements EventSubscriberInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             UnknownNotificationEvent::UNKNOWN_NOTIFICATION_EVENT => ['handleUnknownNotification', 128],

@@ -206,7 +206,7 @@ class PaymentListener extends PaymentService implements EventSubscriberInterface
     /**
      * @inheritDoc
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PayPlugPaymentEvent::CREATE_PAYMENT_EVENT => ['createPayment', 128],

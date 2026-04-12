@@ -50,7 +50,7 @@ class OrderListener implements EventSubscriberInterface
         $this->paymentService->doOrderCapture($event->getOrder());
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             TheliaEvents::ORDER_UPDATE_STATUS => ['onOrderUpdateStatus', 64]

@@ -60,7 +60,7 @@ class OrderFormListener implements EventSubscriberInterface
      *
      * @api
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             TheliaEvents::FORM_AFTER_BUILD.'.'.self::THELIA_CUSTOMER_ORDER_PAYMENT_FROM_NAME => array('addMultiPaymentField', 64),

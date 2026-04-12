@@ -19,7 +19,7 @@ class TreatOrderMultiPaymentCommand extends ContainerAwareCommand
             ->setDescription("Treat multi payment order");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initRequest();
         $dispatcher = $this->getDispatcher();

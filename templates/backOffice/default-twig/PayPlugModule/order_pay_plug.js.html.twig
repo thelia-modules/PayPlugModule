@@ -1,0 +1,40 @@
+<script>
+(function () {
+    var inputAmountRefund = document.getElementById('input_amount_refund');
+    var quickSelect = document.getElementById('quick_select_amount_refund');
+    var refundAmount = document.getElementById('refund_amount');
+
+    if (!inputAmountRefund) {
+        return;
+    }
+
+    var maxAmountRefund = parseFloat(inputAmountRefund.getAttribute('max'));
+
+    function syncRefundAmount() {
+        var value = parseFloat(inputAmountRefund.value);
+        if (isNaN(value) || value > maxAmountRefund) {
+            value = maxAmountRefund;
+        }
+        if (refundAmount) {
+            refundAmount.value = value;
+        }
+    }
+
+    if (quickSelect) {
+        quickSelect.addEventListener('change', function () {
+            var amountToRefund = 0;
+            Array.prototype.forEach.call(quickSelect.selectedOptions, function (option) {
+                amountToRefund += parseFloat(option.value) || 0;
+            });
+            if (amountToRefund > maxAmountRefund) {
+                amountToRefund = maxAmountRefund;
+            }
+            inputAmountRefund.value = amountToRefund;
+            syncRefundAmount();
+        });
+    }
+
+    inputAmountRefund.addEventListener('change', syncRefundAmount);
+    syncRefundAmount();
+})();
+</script>

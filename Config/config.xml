@@ -10,12 +10,6 @@
         -->
     </loops>
 
-    <forms>
-        <form name="payplugmodule_configuration_form" class="PayPlugModule\Form\ConfigurationForm" />
-        <form name="payplugmodule_order_action_form" class="PayPlugModule\Form\OrderActionForm" />
-        <form name="payplugmodule_order_action_form_refund" class="PayPlugModule\Form\OrderRefundForm" />
-    </forms>
-
     <commands>
         <command class="PayPlugModule\Command\TreatOrderMultiPaymentCommand" />
     </commands>
@@ -24,19 +18,6 @@
         <service id="payplugmodule_payment_service" alias="PayPlugModule\Service\PaymentService" public="true">
         </service>
     </services>
-
-    <hooks>
-        <hook id="payplugmodule_back_hook" class="PayPlugModule\Hook\BackHookManager">
-            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfigure" />
-            <tag name="hook.event_listener" event="order-edit.payment-module-bottom" type="back" method="onOrderEditPaymentModuleBottom"/>
-            <tag name="hook.event_listener" event="order.edit-js " type="back" templates="js:PayPlugModule/order_pay_plug.js"/>
-        </hook>
-        <hook id="payplugmodule_front_hook" class="PayPlugModule\Hook\FrontHookManager">
-            <argument type="service" id="thelia.taxEngine"/>
-            <tag name="hook.event_listener" event="order-invoice.after-javascript-include" type="front" method="onOrderInvoiceAfterJsInclude"/>
-            <tag name="hook.event_listener" event="order-invoice.payment-extra" type="front" method="onOrderInvoicePaymentExtra"/>
-        </hook>
-    </hooks>
 
     <!--
     <exports>

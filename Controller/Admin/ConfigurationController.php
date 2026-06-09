@@ -6,25 +6,14 @@ use PayPlugModule\Form\ConfigurationForm;
 use PayPlugModule\Model\PayPlugConfigValue;
 use PayPlugModule\Model\PayPlugModuleDeliveryTypeQuery;
 use PayPlugModule\PayPlugModule;
-use PayPlugModule\Service\OrderStatusService;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
+use Thelia\Tools\URL;
 
 class ConfigurationController extends BaseAdminController
 {
-    public function viewAction(OrderStatusService $orderStatusesService)
-    {
-        $orderStatusesService->initAllStatuses();
-        $deliveryModuleFormFields = ConfigurationForm::getDeliveryModuleFormFields();
-
-        return $this->render(
-            "PayPlugModule/configuration",
-                compact('deliveryModuleFormFields')
-        );
-    }
-
     public function saveAction()
     {
         if (null !== $response = $this->checkAuth(array(AdminResources::MODULE), 'PayPlugModule', AccessManager::UPDATE)) {
@@ -49,7 +38,6 @@ class ConfigurationController extends BaseAdminController
                         ->save();
                 }
             }
-
         } catch (\Exception $e) {
             $this->setupFormErrorContext(
                 Translator::getInstance()->trans(
@@ -60,10 +48,12 @@ class ConfigurationController extends BaseAdminController
                 $e->getMessage(),
                 $form
             );
-            return $this->viewAction();
+
+            return $this->generateRedirect(
+                URL::getInstance()->absoluteUrl('/admin/module/PayPlugModule')
+            );
         }
 
         return $this->generateSuccessRedirect($form);
     }
-
 }

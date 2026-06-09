@@ -1,0 +1,208 @@
+{# PayPlug module configuration — rendered as a fragment by the module.configuration back hook #}
+<div class="card mb-3" id="payplug-config">
+    <div class="card-header">
+        <h2 class="card-title h5 mb-0">{{ 'PayPlug module configuration'|trans({}, 'payplugmodule.bo.default') }}</h2>
+    </div>
+    <div class="card-body">
+        <form action="{{ path('admin.payplugmodule.config.save') }}" method="POST">
+            {% if form_error %}
+                <div class="alert alert-danger">{{ form_error_message }}</div>
+            {% endif %}
+
+            <input type="hidden" name="success_url" value="{{ app.request.uri }}">
+            {% do form.success_url.setRendered %}
+
+            <div class="mb-4 pb-3 border-bottom">
+                <img style="height: 34px;" src="{{ asset('assets/modules/payplugmodule/assets/logo-payplug.png') }}" alt="Payment configuration" class="img-fluid" />
+            </div>
+
+            <div class="mb-4 pb-3 border-bottom">
+                <h3 class="h5">{{ 'PayPlug offer'|trans({}, 'payplugmodule.bo.default') }}</h3>
+                <div class="mb-3" id="payplug-offer-field">
+                    {{ form_label(form.offer) }}
+                    {{ form_widget(form.offer) }}
+                    {{ form_errors(form.offer) }}
+                </div>
+            </div>
+
+            <div class="mb-4 pb-3 border-bottom">
+                <h3 class="h5">{{ 'PayPlug API configuration'|trans({}, 'payplugmodule.bo.default') }}</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        {{ form_label(form.api_mode) }}
+                        {{ form_widget(form.api_mode, {attr: {class: 'form-select'}}) }}
+                        {{ form_errors(form.api_mode) }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        {{ form_label(form.live_api_key) }}
+                        {{ form_widget(form.live_api_key) }}
+                        {{ form_help(form.live_api_key) }}
+                        {{ form_errors(form.live_api_key) }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        {{ form_label(form.test_api_key) }}
+                        {{ form_widget(form.test_api_key) }}
+                        {{ form_help(form.test_api_key) }}
+                        {{ form_errors(form.test_api_key) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4 pb-3 border-bottom">
+                <h3 class="h5">{{ 'PayPlug basic payment configuration'|trans({}, 'payplugmodule.bo.default') }}</h3>
+                <div class="form-check mb-3">
+                    {{ form_widget(form.payment_enabled) }}
+                    {{ form_label(form.payment_enabled) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.payment_page_type) }}
+                    {{ form_widget(form.payment_page_type, {attr: {class: 'form-select'}}) }}
+                    {{ form_help(form.payment_page_type) }}
+                </div>
+                <div class="form-check mb-3">
+                    {{ form_widget(form.send_confirmation_message_only_if_paid) }}
+                    {{ form_label(form.send_confirmation_message_only_if_paid) }}
+                    {{ form_help(form.send_confirmation_message_only_if_paid) }}
+                </div>
+            </div>
+
+            <div class="mb-4 pb-3 border-bottom" id="pro_configuration">
+                <h3 class="h5">{{ 'PayPlug pro offer configuration'|trans({}, 'payplugmodule.bo.default') }}</h3>
+                <div class="form-check mb-3">
+                    {{ form_widget(form.one_click_payment_enabled) }}
+                    {{ form_label(form.one_click_payment_enabled) }}
+                    {{ form_help(form.one_click_payment_enabled) }}
+                </div>
+                <div class="form-check mb-3">
+                    {{ form_widget(form.multi_payment_enabled) }}
+                    {{ form_label(form.multi_payment_enabled) }}
+                    {{ form_help(form.multi_payment_enabled) }}
+                </div>
+                <div id="multi_payment_fields">
+                    <div class="alert alert-warning">
+                        {{ 'Payments in several times are not guaranteed, a default may occur on future due dates.'|trans({}, 'payplugmodule.bo.default') }}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form_label(form.multi_payment_minimum) }}
+                            {{ form_widget(form.multi_payment_minimum, {attr: {type: 'number', min: 0}}) }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form_label(form.multi_payment_maximum) }}
+                            {{ form_widget(form.multi_payment_maximum, {attr: {type: 'number', min: 0}}) }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form_label(form.multi_payment_times) }}
+                            {{ form_widget(form.multi_payment_times, {attr: {class: 'form-select'}}) }}
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            {{ 'To trigger the payments on planned date please add a daily cron on this Thelia command '|trans({}, 'payplugmodule.bo.default') }}
+                            <strong>php Thelia payplug:treat:multi_payment</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4 pb-3 border-bottom" id="premium_configuration">
+                <h3 class="h5">{{ 'PayPlug premium offer configuration'|trans({}, 'payplugmodule.bo.default') }}</h3>
+                <div class="form-check mb-3">
+                    {{ form_widget(form.differed_payment_enabled) }}
+                    {{ form_label(form.differed_payment_enabled) }}
+                    {{ form_help(form.differed_payment_enabled) }}
+                </div>
+                <div class="row" id="differed_payment_fields">
+                    <div class="col-md-4 mb-3">
+                        {{ form_label(form.differed_payment_authorized_capture_status) }}
+                        {{ form_widget(form.differed_payment_authorized_capture_status, {attr: {class: 'form-select'}}) }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        {{ form_label(form.differed_payment_trigger_capture_status) }}
+                        {{ form_widget(form.differed_payment_trigger_capture_status, {attr: {class: 'form-select'}}) }}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        {{ form_label(form.differed_payment_capture_expired_status) }}
+                        {{ form_widget(form.differed_payment_capture_expired_status, {attr: {class: 'form-select'}}) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4 pb-3 border-bottom">
+                <h3 class="h5">{{ 'PayPlug delivery type configuration'|trans({}, 'payplugmodule.bo.default') }}</h3>
+                <p>{{ 'Please select a Pay Plug delivery type correspondance for each delivery modules'|trans({}, 'payplugmodule.bo.default') }}</p>
+                <div class="row">
+                    {% for deliveryModuleFormField in deliveryModuleFormFields %}
+                        {% set fieldName = deliveryModuleFormField.name %}
+                        <div class="col-md-3 mb-3">
+                            {{ form_label(attribute(form, fieldName)) }}
+                            {{ form_widget(attribute(form, fieldName), {attr: {class: 'form-select'}}) }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form_rest(form) }}
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-save"></i> {{ 'Save'|trans({}, 'payplugmodule.bo.default') }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{ safe_hook('payplugmodule.configuration.bottom') }}
+
+<script>
+(function () {
+    var root = document.getElementById('payplug-config');
+    if (!root || root.dataset.payplugInit) { return; }
+    root.dataset.payplugInit = '1';
+
+    var offerInputs = root.querySelectorAll('#payplug-offer-field input[type="radio"]');
+    var proBlock = document.getElementById('pro_configuration');
+    var premiumBlock = document.getElementById('premium_configuration');
+    var multiToggle = root.querySelector('input[name="multi_payment_enabled"]');
+    var multiBlock = document.getElementById('multi_payment_fields');
+    var differedToggle = root.querySelector('input[name="differed_payment_enabled"]');
+    var differedBlock = document.getElementById('differed_payment_fields');
+
+    function selectedOffer() {
+        for (var i = 0; i < offerInputs.length; i++) {
+            if (offerInputs[i].checked) { return offerInputs[i].value; }
+        }
+        return null;
+    }
+
+    function refreshOfferBlocks() {
+        var offer = selectedOffer();
+        proBlock.style.display = 'none';
+        premiumBlock.style.display = 'none';
+        if (offer === 'pro') {
+            proBlock.style.display = '';
+        } else if (offer === 'premium') {
+            proBlock.style.display = '';
+            premiumBlock.style.display = '';
+        }
+    }
+
+    function refreshMulti() {
+        multiBlock.style.display = (multiToggle && multiToggle.checked) ? '' : 'none';
+    }
+
+    function refreshDiffered() {
+        differedBlock.style.display = (differedToggle && differedToggle.checked) ? '' : 'none';
+    }
+
+    offerInputs.forEach(function (input) { input.addEventListener('change', refreshOfferBlocks); });
+    if (multiToggle) { multiToggle.addEventListener('change', refreshMulti); }
+    if (differedToggle) { differedToggle.addEventListener('change', refreshDiffered); }
+
+    refreshOfferBlocks();
+    refreshMulti();
+    refreshDiffered();
+})();
+</script>

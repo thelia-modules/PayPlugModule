@@ -4,9 +4,6 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="admin.payplugmodule.config" path="/admin/module/PayPlugModule">
-        <default key="_controller">PayPlugModule\Controller\Admin\ConfigurationController::viewAction</default>
-    </route>
     <route id="admin.payplugmodule.config.save" path="/admin/module/payplugmodule/configuration" methods="POST">
         <default key="_controller">PayPlugModule\Controller\Admin\ConfigurationController::saveAction</default>
     </route>

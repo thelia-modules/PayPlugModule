@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Install\Database;
+use Thelia\Core\Install\Database;
 use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Module\AbstractPaymentModule;
@@ -155,7 +155,13 @@ class PayPlugModule extends AbstractPaymentModule
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->exclude([
+                __DIR__.'/I18n/*',
+                __DIR__.'/Config/*',
+                __DIR__.'/Model/Base/*',
+                __DIR__.'/Model/Map/*',
+                __DIR__.'/PayPlugModule.php',
+            ])
             ->autowire(true)
             ->autoconfigure(true);
     }

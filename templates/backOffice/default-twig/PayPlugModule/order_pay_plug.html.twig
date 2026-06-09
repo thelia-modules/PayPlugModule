@@ -1,0 +1,145 @@
+{# PayPlug order data — rendered by the order-edit.payment-module-bottom back hook #}
+<div id="orderPayPlug" class="card mb-3">
+    <div class="card-header">
+        <h4 class="card-title h5 mb-0">{{ 'PayPlug order data'|trans({}, 'payplugmodule.bo.default') }}</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <tbody>
+            {% if amountRefunded or isPaid %}
+                <tr>
+                    <th>{{ 'Refund'|trans({}, 'payplugmodule.bo.default') }}</th>
+                    <td></td>
+                    <td>
+                        {% if amountRefunded %}
+                            <div class="alert alert-info">{{ (amountRefunded / 100)|number_format(2, '.', ' ') }} {{ currency }} {{ ' refunded'|trans({}, 'payplugmodule.bo.default') }}</div>
+                        {% endif %}
+                        {% if orderTotalAmount > (amountRefunded|default(0) / 100) %}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label class="form-label" for="quick_select_amount_refund">{{ 'What do you want refund'|trans({}, 'payplugmodule.bo.default') }}</label>
+                                    <select class="form-select" id="quick_select_amount_refund" multiple="multiple">
+                                        <option value="{{ orderTotalAmount }}" selected>{{ 'The entire order'|trans({}, 'payplugmodule.bo.default') }} ---- {{ orderTotalAmount|number_format(2, '.', ' ') }} {{ currency }}</option>
+                                        <option value="{{ orderTotalAmountWithoutShipping }}">{{ 'Order without shipping'|trans({}, 'payplugmodule.bo.default') }} ----{{ orderTotalAmountWithoutShipping|number_format(2, '.', ' ') }} {{ currency }}</option>
+                                        <optgroup label="{{ 'Products'|trans({}, 'payplugmodule.bo.default') }}">
+                                            {% for orderProduct in orderProducts %}
+                                                <option value="{{ orderProduct.realTotalTaxedPrice }}">[{{ orderProduct.ref }}] {{ orderProduct.title }} ---- {{ orderProduct.realTotalTaxedPrice|number_format(2, '.', ' ') }} {{ currency }}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="input_amount_refund">{{ 'Adjust amount'|trans({}, 'payplugmodule.bo.default') }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-chevron-right"></i></span>
+                                        <input id="input_amount_refund" class="form-control" type="number" max="{{ orderTotalAmount - (amountRefunded|default(0) / 100) }}" value="{{ orderTotalAmount - (amountRefunded|default(0) / 100) }}">
+                                        <span class="input-group-text">{{ currency }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">&nbsp;</label>
+                                    <a class="btn btn-success w-100" href="#" data-bs-toggle="modal" data-bs-target="#order_refund_dialog">
+                                        {{ 'Refund'|trans({}, 'payplugmodule.bo.default') }}
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+            {% if needCapture %}
+                <tr>
+                    <th>{{ 'Differed payment'|trans({}, 'payplugmodule.bo.default') }}</th>
+                    {% if capturedAt is null %}
+                        <td>{{ 'Payment capture will expire on '|trans({}, 'payplugmodule.bo.default') }}{{ captureExpireAt ? captureExpireAt|date('Y-m-d H:i') : '' }}</td>
+                        <td>
+                            <a class="btn btn-success w-100" href="#" data-bs-toggle="modal" data-bs-target="#order_capture_dialog">
+                                {{ 'Force the capture for this order'|trans({}, 'payplugmodule.bo.default') }}
+                            </a>
+                        </td>
+                    {% else %}
+                        <td></td>
+                        <td>
+                            {{ 'Payment was captured at '|trans({}, 'payplugmodule.bo.default') }}{{ capturedAt|date('Y-m-d H:i') }}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endif %}
+            {% if multiPayments|length > 0 %}
+                <tr>
+                    <th>{{ 'Multi payment'|trans({}, 'payplugmodule.bo.default') }}</th>
+                    <td colspan="2">
+                        <table class="table table-sm">
+                            <tr>
+                                <th>{{ 'Payment n° '|trans({}, 'payplugmodule.bo.default') }}</th>
+                                <th>{{ 'Amount'|trans({}, 'payplugmodule.bo.default') }}</th>
+                                <th>{{ 'Planned at'|trans({}, 'payplugmodule.bo.default') }}</th>
+                                <th>{{ 'Paid at'|trans({}, 'payplugmodule.bo.default') }}</th>
+                                <th>{{ 'Refunded at'|trans({}, 'payplugmodule.bo.default') }}</th>
+                            </tr>
+                            {% for multiPayment in multiPayments %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ (multiPayment.amount / 100)|number_format(2, '.', ' ') }} {{ currency }}</td>
+                                    <td>{% if multiPayment.plannedAt %}{{ multiPayment.plannedAt|date('Y-m-d H:i') }}{% else %}{{ 'Canceled'|trans({}, 'payplugmodule.bo.default') }}{% endif %}</td>
+                                    <td>{% if multiPayment.paidAt %}{{ multiPayment.paidAt|date('Y-m-d H:i') }}{% endif %}</td>
+                                    <td>{% if multiPayment.refundedAt %}{{ multiPayment.refundedAt|date('Y-m-d H:i') }}{% endif %}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# Refund confirmation modal #}
+<div class="modal fade" id="order_refund_dialog" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ path('admin.payplugmodule.order.refund') }}">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ 'Refund order'|trans({}, 'payplugmodule.bo.default') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ 'Do you really want to refund this order ?'|trans({}, 'payplugmodule.bo.default') }}</p>
+                    <input type="hidden" name="_token" value="{{ assignToken() }}">
+                    <input type="hidden" name="success_url" value="{{ app.request.uri }}">
+                    <input type="hidden" name="order_id" value="{{ order_id }}">
+                    <input type="hidden" id="refund_amount" name="refund_amount" value="{{ orderTotalAmount|default('') }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans({}, 'payplugmodule.bo.default') }}</button>
+                    <button type="submit" class="btn btn-success">{{ 'Refund'|trans({}, 'payplugmodule.bo.default') }}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{# Capture confirmation modal #}
+<div class="modal fade" id="order_capture_dialog" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ path('admin.payplugmodule.order.capture') }}">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ 'Capture order'|trans({}, 'payplugmodule.bo.default') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ 'Do you really want to capture this order ?'|trans({}, 'payplugmodule.bo.default') }}</p>
+                    <input type="hidden" name="_token" value="{{ assignToken() }}">
+                    <input type="hidden" name="success_url" value="{{ app.request.uri }}">
+                    <input type="hidden" name="order_id" value="{{ order_id }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans({}, 'payplugmodule.bo.default') }}</button>
+                    <button type="submit" class="btn btn-success">{{ 'Capture'|trans({}, 'payplugmodule.bo.default') }}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

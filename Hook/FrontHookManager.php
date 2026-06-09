@@ -8,7 +8,7 @@ use PayPlugModule\PayPlugModule;
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 use Thelia\Model\Country;
-use Thelia\TaxEngine\TaxEngine;
+use Thelia\Domain\Taxation\TaxEngine\TaxEngine;
 
 class FrontHookManager extends BaseHook
 {

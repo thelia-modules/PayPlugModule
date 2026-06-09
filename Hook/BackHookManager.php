@@ -52,10 +52,13 @@ class BackHookManager extends BaseHook
         $event->add(
             $this->render(
                 'PayPlugModule/configuration.html.twig',
-                [
-                    'form' => $form->createView()->getView(),
-                    'deliveryModuleFormFields' => ConfigurationForm::getDeliveryModuleFormFields(),
-                ]
+                array_merge(
+                    $event->getArguments(),
+                    [
+                        'form' => $form->createView()->getView(),
+                        'deliveryModuleFormFields' => ConfigurationForm::getDeliveryModuleFormFields(),
+                    ]
+                )
             )
         );
     }

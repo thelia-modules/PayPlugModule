@@ -106,10 +106,10 @@
                 </div>
                 <div class="modal-body">
                     <p>{{ 'Do you really want to refund this order ?'|trans({}, 'payplugmodule.bo.default') }}</p>
-                    <input type="hidden" name="_token" value="{{ assignToken() }}">
-                    <input type="hidden" name="success_url" value="{{ app.request.uri }}">
-                    <input type="hidden" name="order_id" value="{{ order_id }}">
-                    <input type="hidden" id="refund_amount" name="refund_amount" value="{{ orderTotalAmount|default('') }}">
+                    <input type="hidden" name="{{ refund_form.vars.full_name }}[_token]" value="{{ refund_form._token.vars.value }}">
+                    <input type="hidden" name="{{ refund_form.vars.full_name }}[success_url]" value="{{ app.request.uri }}">
+                    <input type="hidden" name="{{ refund_form.vars.full_name }}[order_id]" value="{{ order_id }}">
+                    <input type="hidden" id="refund_amount" name="{{ refund_form.vars.full_name }}[refund_amount]" value="{{ orderTotalAmount|default('') }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans({}, 'payplugmodule.bo.default') }}</button>
@@ -131,9 +131,9 @@
                 </div>
                 <div class="modal-body">
                     <p>{{ 'Do you really want to capture this order ?'|trans({}, 'payplugmodule.bo.default') }}</p>
-                    <input type="hidden" name="_token" value="{{ assignToken() }}">
-                    <input type="hidden" name="success_url" value="{{ app.request.uri }}">
-                    <input type="hidden" name="order_id" value="{{ order_id }}">
+                    <input type="hidden" name="{{ capture_form.vars.full_name }}[_token]" value="{{ capture_form._token.vars.value }}">
+                    <input type="hidden" name="{{ capture_form.vars.full_name }}[success_url]" value="{{ app.request.uri }}">
+                    <input type="hidden" name="{{ capture_form.vars.full_name }}[order_id]" value="{{ order_id }}">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel'|trans({}, 'payplugmodule.bo.default') }}</button>

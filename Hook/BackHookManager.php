@@ -3,6 +3,8 @@
 namespace PayPlugModule\Hook;
 
 use PayPlugModule\Form\ConfigurationForm;
+use PayPlugModule\Form\OrderActionForm;
+use PayPlugModule\Form\OrderRefundForm;
 use PayPlugModule\Model\OrderPayPlugData;
 use PayPlugModule\Model\OrderPayPlugDataQuery;
 use PayPlugModule\Model\OrderPayPlugMultiPaymentQuery;
@@ -119,6 +121,8 @@ class BackHookManager extends BaseHook
                 array_merge(
                     $event->getArguments(),
                     [
+                        'refund_form' => $this->formFactory->createForm(OrderRefundForm::getName())->getForm()->createView(),
+                        'capture_form' => $this->formFactory->createForm(OrderActionForm::getName())->getForm()->createView(),
                         'isPaid' => $isPaid,
                         'currency' => $order->getCurrency()->getSymbol(),
                         'orderTotalAmount' => $orderTotalAmount,

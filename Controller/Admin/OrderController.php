@@ -42,8 +42,6 @@ class OrderController extends BaseAdminController
             );
         }
 
-        // Sleep to let time for PayPlug to send validation
-        sleep(2);
         $url = $this->retrieveSuccessUrl($form);
         return $this->generateRedirect($url.'#orderPayPlug');
     }
@@ -74,8 +72,6 @@ class OrderController extends BaseAdminController
             );
         }
 
-        // Sleep to let time for PayPlug to send validation
-        sleep(2);
         $url = $this->retrieveSuccessUrl($form);
         return $this->generateRedirect($url.'#orderPayPlug');
     }

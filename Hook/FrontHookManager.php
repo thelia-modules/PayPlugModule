@@ -54,7 +54,12 @@ class FrontHookManager extends BaseHook
         /** @var Country $country */
         $country = $this->taxEngine->getDeliveryCountry();
 
-        $cart = $this->getSession()->getSessionCart();
+        $request = $this->getRequest();
+        if (null === $request || !$request->hasSession()) {
+            return;
+        }
+
+        $cart = $request->getSession()->getSessionCart();
         $cartAmount = $cart->getTaxedAmount($country);
         if ($cartAmount <= $minimumAmount || $cartAmount >= $maximumAmount) {
             return;
@@ -74,7 +79,12 @@ class FrontHookManager extends BaseHook
             return;
         }
 
-        $customerId = $this->getSession()->getCustomerUser()->getId();
+        $request = $this->getRequest();
+        if (null === $request || !$request->hasSession()) {
+            return;
+        }
+
+        $customerId = $request->getSession()->getCustomerUser()->getId();
 
         $payPlugCard = PayPlugCardQuery::create()
             ->findOneByCustomerId($customerId);

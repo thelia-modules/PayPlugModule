@@ -89,7 +89,10 @@ class PayPlugModule extends AbstractPaymentModule
 
             $slice = 1;
 
-            $isMultiPayment = $this->getRequest()->getSession()->get(OrderFormListener::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 0);
+            $request = $this->getRequest();
+            $isMultiPayment = $request->hasSession()
+                ? $request->getSession()->get(OrderFormListener::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 0)
+                : 0;
             $orderTotalAmount = $this->getOrderPayTotalAmount($order);
 
             if ($isMultiPayment) {

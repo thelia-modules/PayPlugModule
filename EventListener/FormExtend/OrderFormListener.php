@@ -43,14 +43,25 @@ class OrderFormListener implements EventSubscriberInterface
 
     public function checkMultiPaymentSelected(OrderEvent $event)
     {
-        $this->request->getSession()->set(self::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 0);
-        $formData = $this->request->get(self::THELIA_CUSTOMER_ORDER_PAYMENT_FROM_NAME);
+        $request = $this->request;
+        if (null === $request || !$request->hasSession()) {
+            return;
+        }
+
+        $request->getSession()->set(self::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 0);
+        $formData = $request->attributes->get(
+            self::THELIA_CUSTOMER_ORDER_PAYMENT_FROM_NAME,
+            $request->query->get(
+                self::THELIA_CUSTOMER_ORDER_PAYMENT_FROM_NAME,
+                $request->request->get(self::THELIA_CUSTOMER_ORDER_PAYMENT_FROM_NAME)
+            )
+        );
 
         if (!isset($formData[self::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME]) || 0 == $formData[self::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME]) {
             return;
         }
 
-        $this->request->getSession()->set(self::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 1);
+        $request->getSession()->set(self::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 1);
     }
 
     /**

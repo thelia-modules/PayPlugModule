@@ -15,7 +15,13 @@ class CardController extends BaseFrontController
         }
 
         $session = $request->getSession();
-        $customerId = $session->getCustomerUser()->getId();
+        $user = $session->getCustomerUser();
+
+        if (null === $user) {
+            return $this->generateRedirect('/');
+        }
+
+        $customerId = $user->getId();
 
         if (null !== $card = PayPlugCardQuery::create()->findOneByCustomerId($customerId)) {
             $card->delete();

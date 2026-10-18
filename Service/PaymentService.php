@@ -45,12 +45,22 @@ class PaymentService
         bool $capture,
         bool $allowSaveCard,
         int $paymentSlice,
-        float $totalOrder
+        float $totalOrder,
+        ?string $returnUrl = null,
+        ?string $cancelUrl = null
     ) {
         $paymentEvent = (new PayPlugPaymentEvent())
             ->buildFromOrder($order,$totalOrder)
             ->setCapture($capture)
             ->setAllowSaveCard($allowSaveCard);
+
+        if (null !== $returnUrl) {
+            $paymentEvent->setHostedPaymentReturnUrl($returnUrl);
+        }
+
+        if (null !== $cancelUrl) {
+            $paymentEvent->setHostedPaymentCancelUrl($cancelUrl);
+        }
 
         if (null !== $card = PayPlugCardQuery::create()->findOneByCustomerId($order->getCustomerId())) {
             $todayDate = date("Y-m");

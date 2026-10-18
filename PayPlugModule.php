@@ -12,7 +12,7 @@
 
 namespace PayPlugModule;
 
-use PayPlugModule\EventListener\FormExtend\OrderFormListener;
+use PayPlugModule\EventListener\PaymentOptionListener;
 use PayPlugModule\Model\PayPlugConfigValue;
 use PayPlugModule\Service\PaymentService;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -26,7 +26,6 @@ use Thelia\Core\Install\Database;
 use Thelia\Log\Tlog;
 use Thelia\Model\Order;
 use Thelia\Module\AbstractPaymentModule;
-use Thelia\Tools\URL;
 
 class PayPlugModule extends AbstractPaymentModule
 {
@@ -91,8 +90,7 @@ class PayPlugModule extends AbstractPaymentModule
 
             $request = $this->getRequest();
             $isMultiPayment = $request->hasSession()
-                ? $request->getSession()->get(OrderFormListener::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 0)
-                : 0;
+                && PaymentOptionListener::isMultiPaymentChosen($request->getSession());
             $orderTotalAmount = $this->getOrderPayTotalAmount($order);
 
             if ($isMultiPayment) {
@@ -109,13 +107,15 @@ class PayPlugModule extends AbstractPaymentModule
                 PayPlugModule::getConfigValue(PayPlugConfigValue::DIFFERED_PAYMENT_ENABLED, false),
                 PayPlugModule::getConfigValue(PayPlugConfigValue::ONE_CLICK_PAYMENT_ENABLED, false),
                 $slice,
-                $orderTotalAmount
+                $orderTotalAmount,
+                $this->getPaymentSuccessPageUrl($order->getId()),
+                $this->getPaymentFailurePageUrl($order->getId(), null)
             );
 
             $forceRedirect = false;
             if (true === $payment['isPaid']) {
                 $forceRedirect = true;
-                $payment['url'] = URL::getInstance()->absoluteUrl('/order/placed/'.$order->getId());
+                $payment['url'] = $this->getPaymentSuccessPageUrl($order->getId());
             }
 
             if ($this->getRequest()->isXmlHttpRequest()) {
@@ -127,13 +127,14 @@ class PayPlugModule extends AbstractPaymentModule
                 );
             }
         } catch (\Exception $exception) {
-            if ($this->getRequest()->isXmlHttpRequest()) {
-                return new JsonResponse(['error' => $exception->getMessage()], 400);
-            }
             Tlog::getInstance()->addError(
                 'Error PayPlugModule::pay() : ' . $exception->getMessage()
             );
-            return new RedirectResponse(URL::getInstance()->absoluteUrl('error'));
+
+            // The failure page of the shop, for a plain request and for the lightbox
+            // script alike: the script follows the redirection. The provider's message
+            // stays in the log.
+            return new RedirectResponse($this->getPaymentFailurePageUrl($order->getId(), null));
         }
 
         return new RedirectResponse($payment['url']);

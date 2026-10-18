@@ -12,7 +12,7 @@
 
 namespace PayPlugModule;
 
-use PayPlugModule\EventListener\FormExtend\OrderFormListener;
+use PayPlugModule\EventListener\PaymentOptionListener;
 use PayPlugModule\Model\PayPlugConfigValue;
 use PayPlugModule\Service\PaymentService;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -90,8 +90,7 @@ class PayPlugModule extends AbstractPaymentModule
 
             $request = $this->getRequest();
             $isMultiPayment = $request->hasSession()
-                ? $request->getSession()->get(OrderFormListener::PAY_PLUG_MULTI_PAYMENT_FIELD_NAME, 0)
-                : 0;
+                && PaymentOptionListener::isMultiPaymentChosen($request->getSession());
             $orderTotalAmount = $this->getOrderPayTotalAmount($order);
 
             if ($isMultiPayment) {

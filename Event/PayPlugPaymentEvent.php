@@ -789,7 +789,7 @@ class PayPlugPaymentEvent extends ActionEvent
      * @param string $paymentId
      * @return PayPlugPaymentEvent
      */
-    public function setPaymentId(string $paymentId = null): PayPlugPaymentEvent
+    public function setPaymentId(?string $paymentId = null): PayPlugPaymentEvent
     {
         $this->paymentId = $paymentId;
         return $this;
@@ -953,7 +953,7 @@ class PayPlugPaymentEvent extends ActionEvent
      * @param string $paymentMethod
      * @return PayPlugPaymentEvent
      */
-    public function setPaymentMethod(string $paymentMethod = null): PayPlugPaymentEvent
+    public function setPaymentMethod(?string $paymentMethod = null): PayPlugPaymentEvent
     {
         $this->paymentMethod = $paymentMethod;
         return $this;
@@ -1583,7 +1583,7 @@ class PayPlugPaymentEvent extends ActionEvent
      * @param string $hostedPaymentReturnUrl
      * @return PayPlugPaymentEvent
      */
-    public function setHostedPaymentReturnUrl(string $hostedPaymentReturnUrl = null): PayPlugPaymentEvent
+    public function setHostedPaymentReturnUrl(?string $hostedPaymentReturnUrl = null): PayPlugPaymentEvent
     {
         $this->hostedPaymentReturnUrl = $hostedPaymentReturnUrl;
         return $this;
@@ -1601,7 +1601,7 @@ class PayPlugPaymentEvent extends ActionEvent
      * @param string $hostedPaymentCancelUrl
      * @return PayPlugPaymentEvent
      */
-    public function setHostedPaymentCancelUrl(string $hostedPaymentCancelUrl = null): PayPlugPaymentEvent
+    public function setHostedPaymentCancelUrl(?string $hostedPaymentCancelUrl = null): PayPlugPaymentEvent
     {
         $this->hostedPaymentCancelUrl = $hostedPaymentCancelUrl;
         return $this;

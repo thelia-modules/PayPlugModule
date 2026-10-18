@@ -18,7 +18,7 @@
         <default key="_controller">PayPlugModule\Controller\NotificationController::entryPoint</default>
     </route>
 
-    <route id="payplugmodule_delete_card" path="/payplug/card/delete">
+    <route id="payplugmodule_delete_card" path="/payplug/card/delete" methods="POST">
         <default key="_controller">PayPlugModule\Controller\CardController::deleteCurrentCustomerCard</default>
     </route>
 

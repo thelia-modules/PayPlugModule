@@ -130,7 +130,7 @@ class PaymentService
         $this->dispatcher->dispatch($paymentEvent, PayPlugPaymentEvent::ORDER_CAPTURE_EVENT);
     }
 
-    public function doOrderRefund(Order $order, int $amountRefund = null)
+    public function doOrderRefund(Order $order, ?int $amountRefund = null)
     {
         $paymentEvent = (new PayPlugPaymentEvent())
             ->buildFromOrder($order);

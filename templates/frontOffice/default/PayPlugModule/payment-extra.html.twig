@@ -7,7 +7,10 @@
         <p class="mt-4"><strong>{{ savedCard.title }}</strong></p>
         <p class="paragraph-4 mt-1">
             {{ savedCard.notice }}
-            <a class="underline" href="{{ savedCard.deleteUrl }}">{{ savedCard.deleteLabel }}</a>
+            <button type="submit" class="underline" form="payplug-delete-card">{{ savedCard.deleteLabel }}</button>
         </p>
+        <form id="payplug-delete-card" method="post" action="{{ savedCard.deleteUrl }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('payplug_card_delete') }}">
+        </form>
     {% endif %}
 </div>

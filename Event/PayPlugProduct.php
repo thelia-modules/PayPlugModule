@@ -38,7 +38,7 @@ class PayPlugProduct
     /** @var integer */
     protected $totalAmount;
 
-    public function buildFromOrderProduct(OrderProduct $orderProduct, PayPlugModuleDeliveryType $payPlugModuleDeliveryType = null)
+    public function buildFromOrderProduct(OrderProduct $orderProduct, ?PayPlugModuleDeliveryType $payPlugModuleDeliveryType = null)
     {
         $storeName = ConfigQuery::read(
             'store_name',

@@ -42,9 +42,9 @@ class PaymentService
      */
     public function sendOrderPayment(
         Order $order,
-        bool $capture = false,
-        bool $allowSaveCard = false,
-        int $paymentSlice = 1,
+        bool $capture,
+        bool $allowSaveCard,
+        int $paymentSlice,
         float $totalOrder
     ) {
         $paymentEvent = (new PayPlugPaymentEvent())

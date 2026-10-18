@@ -1,0 +1,13 @@
+{# Under the PayPlug method of the payment step, once chosen. In lightbox mode the root
+   carries the address the order button leads to: lightbox-script.html.twig opens the
+   PayPlug form instead of following it. The texts come translated from
+   PayPlugPaymentThemeHook; the classes are those of the Flexy theme. #}
+<div class="PayPlugPaymentExtra"{% if payUrl %} data-payplug-lightbox data-pay-url="{{ payUrl }}"{% endif %}>
+    {% if savedCard %}
+        <p class="mt-4"><strong>{{ savedCard.title }}</strong></p>
+        <p class="paragraph-4 mt-1">
+            {{ savedCard.notice }}
+            <a class="underline" href="{{ savedCard.deleteUrl }}">{{ savedCard.deleteLabel }}</a>
+        </p>
+    {% endif %}
+</div>

@@ -1,0 +1,64 @@
+{# In the head of the payment pages, in lightbox mode. A click on a link to the address
+   the PayPlug method of the page names (data-pay-url, see payment-extra.html.twig) is
+   sent in the background: the module answers with the PayPlug payment address, opened in
+   the PayPlug lightbox, or with the address to go to (a card already saved, an error).
+   Without the marker — another method chosen — or without the library, the link is
+   followed as usual and the hosted payment page takes over. #}
+<script src="https://api.payplug.com/js/1/form.latest.js" defer></script>
+<script>
+    (function () {
+        if (window.payPlugLightboxListening) {
+            return;
+        }
+        window.payPlugLightboxListening = true;
+        // One payment asked at a time: a second click while the first is answered would
+        // place the order twice.
+        var pending = false;
+
+        document.addEventListener('click', function (event) {
+            var marker = document.querySelector('[data-payplug-lightbox]');
+            var link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+
+            if (!marker || !link || typeof window.Payplug === 'undefined') {
+                return;
+            }
+
+            var target = new URL(link.href, window.location.href);
+            var payUrl = new URL(marker.getAttribute('data-pay-url'), window.location.href);
+
+            if (target.pathname !== payUrl.pathname) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (pending) {
+                return;
+            }
+            pending = true;
+
+            fetch(target.href, {
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json'}
+            }).then(function (response) {
+                if ((response.headers.get('Content-Type') || '').indexOf('application/json') === -1) {
+                    window.location.assign(response.url);
+
+                    return;
+                }
+
+                return response.json().then(function (payment) {
+                    if (payment.forceRedirect) {
+                        window.location.assign(payment.paymentUrl);
+                    } else {
+                        pending = false;
+                        window.Payplug.showPayment(payment.paymentUrl);
+                    }
+                });
+            }, function () {
+                pending = false;
+            });
+        }, true);
+    })();
+</script>

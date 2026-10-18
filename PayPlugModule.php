@@ -33,7 +33,7 @@ class PayPlugModule extends AbstractPaymentModule
     const DOMAIN_NAME = 'payplugmodule';
 
 
-    public function postActivation(ConnectionInterface $con = null): void
+    public function postActivation(?ConnectionInterface $con = null): void
     {
         if (!$this->getConfigValue('is_initialized', false)) {
             $database = new Database($con);
@@ -41,7 +41,7 @@ class PayPlugModule extends AbstractPaymentModule
         }
     }
 
-    public function update($currentVersion, $newVersion, ConnectionInterface $con = null): void
+    public function update($currentVersion, $newVersion, ?ConnectionInterface $con = null): void
     {
         $finder = Finder::create()
             ->name('*.sql')

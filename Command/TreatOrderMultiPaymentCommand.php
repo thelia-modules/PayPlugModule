@@ -6,6 +6,7 @@ use PayPlugModule\Event\PayPlugPaymentEvent;
 use PayPlugModule\Model\OrderPayPlugMultiPayment;
 use PayPlugModule\Model\OrderPayPlugMultiPaymentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Command\ContainerAwareCommand;
@@ -45,5 +46,7 @@ class TreatOrderMultiPaymentCommand extends ContainerAwareCommand
            $todayPlannedOrderPayment->setPaymentId($paymentEvent->getPaymentId())
                 ->save();
         }
+
+        return Command::SUCCESS;
     }
 }
